@@ -35,7 +35,7 @@ const users = ref([
 ]);
 
 const user = ref({
-    name: "Admin1",
+    name: "Admin",
     email: "admin@example.com",
     avatar: "/images/image.png",
     role: "Admin",

@@ -5,7 +5,7 @@ import { Head } from "@inertiajs/vue3";
 import { LayoutDashboardIcon, EyeIcon } from "lucide-vue-next";
 
 const user = ref({
-    name: "User1",
+    name: "User",
     email: "john@example.com",
     avatar: "/images/image.png",
     role: "User",

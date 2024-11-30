@@ -14,6 +14,9 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->foreignId('role_id')
+                  ->constrained('roles', 'id') // Reference 'borrower_id'
+                  ->onDelete('cascade'); // Handle cascading deletes
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
