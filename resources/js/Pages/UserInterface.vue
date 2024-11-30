@@ -5,8 +5,6 @@ import { Head } from "@inertiajs/vue3";
 import { LayoutDashboardIcon, EyeIcon } from "lucide-vue-next";
 
 const user = ref({
-    name: "User",
-    email: "john@example.com",
     avatar: "/images/image.png",
     role: "User",
 });
@@ -89,10 +87,10 @@ const borrowBook = (book) => {
                     />
                     <div class="text-center">
                         <h2 class="text-lg lg:text-2xl font-bold text-gray-800">
-                            {{ user.name }}
+                            {{ $page.props.auth.user.name }}
                         </h2>
                         <p class="text-sm lg:text-base text-gray-600">
-                            {{ user.email }}
+                            {{ $page.props.auth.user.email }}
                         </p>
                         <p class="text-sm lg:text-base text-gray-500">
                             {{ user.role }}

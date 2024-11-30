@@ -5,8 +5,6 @@ import { Head } from "@inertiajs/vue3";
 import { LayoutDashboardIcon, EyeIcon, PlusIcon } from "lucide-vue-next";
 
 const user = ref({
-  name: "Librarian",
-  email: "john@example.com",
   avatar: "/images/image.png",
   role: "Librarian",
 });
@@ -89,8 +87,8 @@ const deleteBook = (book) => {
         <div class="flex flex-col items-center mb-6">
           <img :src="user.avatar" :alt="user.name" class="w-20 h-20 lg:w-24 lg:h-24 rounded-full border-2 border-black mb-2" />
           <div class="text-center">
-            <h2 class="text-lg lg:text-2xl font-bold text-gray-800">{{ user.name }}</h2>
-            <p class="text-sm lg:text-base text-gray-600">{{ user.email }}</p>
+            <h2 class="text-lg lg:text-2xl font-bold text-gray-800">{{ $page.props.auth.user.name }}</h2>
+            <p class="text-sm lg:text-base text-gray-600">{{ $page.props.auth.user.email }}</p>
             <p class="text-sm lg:text-base text-gray-500">{{ user.role }}</p>
           </div>
         </div>

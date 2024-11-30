@@ -17,26 +17,11 @@ import {
     EyeIcon,
 } from "lucide-vue-next";
 
-// Sample users data (this would typically come from an API)
-const users = ref([
-    { id: 1, name: "John Doe", email: "john.doe@example.com", role: "Admin" },
-    {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane.smith@example.com",
-        role: "Librarian",
-    },
-    {
-        id: 3,
-        name: "Sam Johnson",
-        email: "sam.johnson@example.com",
-        role: "User",
-    }, // New User with role 'User'
-]);
+// users data (this would typically come from an API)
+defineProps(['current_user']);
+
 
 const user = ref({
-    name: "Admin",
-    email: "admin@example.com",
     avatar: "/images/image.png",
     role: "Admin",
 });
@@ -82,26 +67,32 @@ const showAddUser = () => {
 
 // Function to show the Edit User modal, but only allow editing the role
 const editUser = (userToEdit) => {
-    userForm.value = { role: userToEdit.role }; // Only allow editing the role
-    editingUser.value = userToEdit;
-    showAddUserModal.value = true;
+    userForm.value = {
+        id: userToEdit.id, // Keep track of the user's ID
+        name: userToEdit.name,
+        email: userToEdit.email,
+        role: userToEdit.role,
+    };
+    editingUser.value = userToEdit; // Store the selected user
+    showAddUserModal.value = true; // Show the modal
 };
 
 // Function to submit the user (Add or Update), but only update the role
 const submitUser = () => {
     if (editingUser.value) {
-        const index = users.value.findIndex(
-            (u) => u.id === editingUser.value.id
-        );
+        // Update existing user
+        const index = current_user.findIndex((u) => u.id === userForm.value.id);
         if (index !== -1) {
-            users.value[index].role = userForm.value.role; // Update only the role
+            current_user[index] = { ...current_user[index], ...userForm.value };
         }
     } else {
-        const newUser = { ...userForm.value, id: Date.now() }; // Generate a unique id for new user
-        users.value.push(newUser);
+        // Add a new user
+        const newUser = { ...userForm.value, id: Date.now() }; // Generate a unique ID
+        current_user.push(newUser);
     }
     closeModal();
 };
+
 
 // Function to delete user
 const deleteUser = (userId) => {
@@ -112,7 +103,9 @@ const deleteUser = (userId) => {
 const closeModal = () => {
     showAddUserModal.value = false;
     editingUser.value = null;
+    userForm.value = { name: "", email: "", role: "User" }; // Reset the form
 };
+
 </script>
 
 <template>
@@ -138,10 +131,10 @@ const closeModal = () => {
                     />
                     <div class="text-center">
                         <h2 class="text-lg lg:text-2xl font-bold text-gray-800">
-                            {{ user.name }}
+                            {{ $page.props.auth.user.name }}
                         </h2>
                         <p class="text-sm lg:text-base text-gray-600">
-                            {{ user.email }}
+                            {{ $page.props.auth.user.email }}
                         </p>
                         <p class="text-sm lg:text-base text-gray-500">
                             {{ user.role }}
@@ -188,7 +181,7 @@ const closeModal = () => {
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="user in users" :key="user.id">
+                                <tr v-for="user in current_user" :key="user.id">
                                     <td
                                         class="px-4 lg:px-6 py-3 whitespace-nowrap"
                                     >
@@ -202,7 +195,7 @@ const closeModal = () => {
                                     <td
                                         class="px-4 lg:px-6 py-3 whitespace-nowrap"
                                     >
-                                        {{ user.role }}
+                                        {{ user.user_type }}
                                     </td>
                                     <td
                                         class="px-4 lg:px-6 py-3 whitespace-nowrap space-x-2"
@@ -250,7 +243,7 @@ const closeModal = () => {
                             type="text"
                             id="name"
                             v-model="userForm.name"
-                            :disabled="true"
+                            :disabled="!!editingUser"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100"
                         />
                     </div>
@@ -264,7 +257,7 @@ const closeModal = () => {
                             type="email"
                             id="email"
                             v-model="userForm.email"
-                            :disabled="true"
+                            :disabled="!!editingUser"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100"
                         />
                     </div>
@@ -281,7 +274,7 @@ const closeModal = () => {
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring-indigo-200"
                         >
                             <option value="Admin">Admin</option>
-                            <option value="Librarian">Librarian</option>
+                            <option value="Librarian">Editor</option>
                             <option value="User">User</option>
                             <!-- User option added -->
                         </select>

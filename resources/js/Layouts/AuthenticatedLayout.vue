@@ -33,12 +33,12 @@ const showingNavigationDropdown = ref(false);
                   Dashboard
                 </NavLink>
                 <NavLink :href="route('user-interface')" :active="route().current('user-interface')">
-                  Library Management
+                  Library
                 </NavLink>
-                <NavLink :href="route('librarian-interface')" :active="route().current('librarian-interface')">
+                <NavLink :href="route('librarian-interface')" v-if="$page.props.auth.user.role_id === 2 || $page.props.auth.user.role_id === 3" :active="route().current('librarian-interface')">
                   Librarian Management
                 </NavLink>
-                <NavLink :href="route('admin-interface')" :active="route().current('admin-interface')">
+                <NavLink :href="route('admin-dashboard')" v-if="$page.props.auth.user.role_id === 3" :active="route().current('admin-dashboard')">
                   User Management
                 </NavLink>
               </div>
@@ -122,10 +122,10 @@ const showingNavigationDropdown = ref(false);
             <ResponsiveNavLink :href="route('user-interface')" :active="route().current('user-interface')">
               Library Management
             </ResponsiveNavLink>
-            <ResponsiveNavLink :href="route('librarian-interface')" :active="route().current('librarian-interface')">
+            <ResponsiveNavLink v-if="$page.props.auth.user.role_id === 2 || $page.props.auth.user.role_id === 3" :href="route('librarian-interface')" :active="route().current('librarian-interface')">
               Librarian Management
             </ResponsiveNavLink>
-            <ResponsiveNavLink :href="route('admin-interface')" :active="route().current('admin-interface')">
+            <ResponsiveNavLink v-if="$page.props.auth.user.role_id === 3" :href="route('admin-dashboard')" :active="route().current('admin-dashboard')">
               User Management
             </ResponsiveNavLink>
           </div>
