@@ -9,9 +9,43 @@ use Inertia\Inertia;
 
 class AdminController extends Controller
 {
-    public function dashboard()
+
+    public function users()
     {
-        $users = DB::select('SELECT * FROM users_view');
-        return Inertia::render('AdminInterface', ['current_user' => $users]);
+        $users = User::with('role')->get();
+        $roles = DB::table('roles')->get();
+        return Inertia::render('AdminInterface', ['users' => $users, 'roles' => $roles]);
+    }
+
+    public function updateUserRole(Request $request, User $user)
+    {
+        // Prevent editing of admin roles
+        if ($user->role_id == 3) {
+            return back()->withErrors(['message' => 'Admin roles cannot be edited or demoted.']);
+        }
+
+        $validated = $request->validate([
+            'role_id' => 'required|exists:roles,id', // Ensure the role_id exists in the roles table
+        ]);
+
+        // Prevent demotion if the new role is admin
+        if ($validated['role_id'] != 3 && $user->role_id == 3) {
+            return back()->withErrors(['message' => 'Admins cannot be demoted.']);
+        }
+
+        $user->update(['role_id' => $validated['role_id']]);
+
+        return back()->with('message', 'User role updated successfully!');
+    }
+
+
+    public function deleteUser(User $user)
+    {
+        if ($user->role->user_type === 'admin') {
+            return redirect()->back()->with('error', 'Admin users cannot be deleted.');
+        }
+        $user->delete();
+
+        return redirect()->back()->with('message', 'User deleted successfully');
     }
 }

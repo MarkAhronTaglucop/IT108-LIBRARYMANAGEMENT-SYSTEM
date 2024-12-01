@@ -27,9 +27,9 @@ Route::middleware(['auth', 'setDB'])->group(function () {
 
 
     Route::middleware(['admin'])->group(function () {
-
-        
-        Route::get('/admin-dashboard', [AdminController::class, 'dashboard'])->name('admin-dashboard');
+        Route::get('/admin-dashboard', [AdminController::class, 'users'])->name('admin-dashboard');
+        Route::put('/admin-users/{user}', [AdminController::class, 'updateUserRole'])->name('admin.updateUserRole');
+        Route::delete('/admin-users/{user}', [AdminController::class, 'deleteUser'])->name('admin.deleteUser');
     });
 });
 
