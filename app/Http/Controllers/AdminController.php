@@ -19,6 +19,8 @@ class AdminController extends Controller
 
     public function updateUserRole(Request $request, User $user)
     {
+
+        // $before = DB::select("select current_user, session_user");
         // Prevent editing of admin roles
         if ($user->role_id == 3) {
             return back()->withErrors(['message' => 'Admin roles cannot be edited or demoted.']);
@@ -34,6 +36,10 @@ class AdminController extends Controller
         }
 
         $user->update(['role_id' => $validated['role_id']]);
+
+        // $after = DB::select("select current_user, session_user");
+
+        // dd($before, $after);
 
         return back()->with('message', 'User role updated successfully!');
     }

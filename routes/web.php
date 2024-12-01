@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
-
+use App\Http\Controllers\LibrarianController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -24,7 +24,9 @@ Route::middleware(['auth', 'setDB'])->group(function () {
     })->name('dashboard');
 
 
-
+    Route::middleware(['librarian'])->group(function () {
+        Route::get('/librarian-dashboard', [LibrarianController::class, 'users'])->name('librarian-dashboard');
+    });
 
     Route::middleware(['admin'])->group(function () {
         Route::get('/admin-dashboard', [AdminController::class, 'users'])->name('admin-dashboard');
@@ -42,9 +44,6 @@ Route::get('/user-interface', function () {
     return Inertia::render('UserInterface');
 })->middleware(['auth', 'verified'])->name('user-interface');
 
-Route::get('/librarian-interface', function () {
-    return Inertia::render('LibrarianInterface');
-})->middleware(['auth', 'verified'])->name('librarian-interface');
 
 
 
@@ -54,4 +53,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head } from "@inertiajs/vue3";
+import { Head, router } from "@inertiajs/vue3";
 import { LayoutDashboardIcon, EyeIcon, PlusIcon } from "lucide-vue-next";
 
 const user = ref({

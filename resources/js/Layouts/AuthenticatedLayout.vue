@@ -1,11 +1,11 @@
 <script setup>
-import { ref } from 'vue';
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import Dropdown from '@/Components/Dropdown.vue';
-import DropdownLink from '@/Components/DropdownLink.vue';
-import NavLink from '@/Components/NavLink.vue';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import { Link } from '@inertiajs/vue3';
+import { ref } from "vue";
+import ApplicationLogo from "@/Components/ApplicationLogo.vue";
+import Dropdown from "@/Components/Dropdown.vue";
+import DropdownLink from "@/Components/DropdownLink.vue";
+import NavLink from "@/Components/NavLink.vue";
+import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
+import { Link } from "@inertiajs/vue3";
 
 const showingNavigationDropdown = ref(false);
 </script>
@@ -29,16 +29,33 @@ const showingNavigationDropdown = ref(false);
 
               <!-- Navigation Links -->
               <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
+                <NavLink
+                  :href="route('dashboard')"
+                  :active="route().current('dashboard')"
+                >
                   Dashboard
                 </NavLink>
-                <NavLink :href="route('user-interface')" :active="route().current('user-interface')">
+                <NavLink
+                  :href="route('user-interface')"
+                  :active="route().current('user-interface')"
+                >
                   Library
                 </NavLink>
-                <NavLink :href="route('librarian-interface')" v-if="$page.props.auth.user.role_id === 2 || $page.props.auth.user.role_id === 3" :active="route().current('librarian-interface')">
-                  Librarian Management
+                <NavLink
+                  :href="route('librarian-dashboard')"
+                  v-if="
+                    $page.props.auth.user.role_id === 2 ||
+                    $page.props.auth.user.role_id === 3
+                  "
+                  :active="route().current('librarian-dashboard')"
+                >
+                  Library Management
                 </NavLink>
-                <NavLink :href="route('admin-dashboard')" v-if="$page.props.auth.user.role_id === 3" :active="route().current('admin-dashboard')">
+                <NavLink
+                  :href="route('admin-dashboard')"
+                  v-if="$page.props.auth.user.role_id === 3"
+                  :active="route().current('admin-dashboard')"
+                >
                   User Management
                 </NavLink>
               </div>
@@ -72,8 +89,14 @@ const showingNavigationDropdown = ref(false);
                   </template>
 
                   <template #content>
-                    <DropdownLink :href="route('profile.edit')">Profile</DropdownLink>
-                    <DropdownLink :href="route('logout')" method="post" as="button">
+                    <DropdownLink :href="route('profile.edit')"
+                      >Profile</DropdownLink
+                    >
+                    <DropdownLink
+                      :href="route('logout')"
+                      method="post"
+                      as="button"
+                    >
                       Log Out
                     </DropdownLink>
                   </template>
@@ -87,10 +110,18 @@ const showingNavigationDropdown = ref(false);
                 @click="showingNavigationDropdown = !showingNavigationDropdown"
                 class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
               >
-                <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                <svg
+                  class="h-6 w-6"
+                  stroke="currentColor"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
                   <!-- Hamburger Icon -->
                   <path
-                    :class="{ hidden: showingNavigationDropdown, 'inline-flex': !showingNavigationDropdown }"
+                    :class="{
+                      hidden: showingNavigationDropdown,
+                      'inline-flex': !showingNavigationDropdown,
+                    }"
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
@@ -98,7 +129,10 @@ const showingNavigationDropdown = ref(false);
                   />
                   <!-- Close Icon -->
                   <path
-                    :class="{ hidden: !showingNavigationDropdown, 'inline-flex': showingNavigationDropdown }"
+                    :class="{
+                      hidden: !showingNavigationDropdown,
+                      'inline-flex': showingNavigationDropdown,
+                    }"
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
@@ -112,20 +146,40 @@ const showingNavigationDropdown = ref(false);
 
         <!-- Responsive Navigation Menu -->
         <div
-          :class="{ block: showingNavigationDropdown, hidden: !showingNavigationDropdown }"
+          :class="{
+            block: showingNavigationDropdown,
+            hidden: !showingNavigationDropdown,
+          }"
           class="sm:hidden"
         >
           <div class="space-y-1 pb-3 pt-2">
-            <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
+            <ResponsiveNavLink
+              :href="route('dashboard')"
+              :active="route().current('dashboard')"
+            >
               Dashboard
             </ResponsiveNavLink>
-            <ResponsiveNavLink :href="route('user-interface')" :active="route().current('user-interface')">
+            <ResponsiveNavLink
+              :href="route('user-interface')"
+              :active="route().current('user-interface')"
+            >
               Library Management
             </ResponsiveNavLink>
-            <ResponsiveNavLink v-if="$page.props.auth.user.role_id === 2 || $page.props.auth.user.role_id === 3" :href="route('librarian-interface')" :active="route().current('librarian-interface')">
+            <ResponsiveNavLink
+              v-if="
+                $page.props.auth.user.role_id === 2 ||
+                $page.props.auth.user.role_id === 3
+              "
+              :href="route('librarian-dashboard')"
+              :active="route().current('librarian-dashboard')"
+            >
               Librarian Management
             </ResponsiveNavLink>
-            <ResponsiveNavLink v-if="$page.props.auth.user.role_id === 3" :href="route('admin-dashboard')" :active="route().current('admin-dashboard')">
+            <ResponsiveNavLink
+              v-if="$page.props.auth.user.role_id === 3"
+              :href="route('admin-dashboard')"
+              :active="route().current('admin-dashboard')"
+            >
               User Management
             </ResponsiveNavLink>
           </div>
@@ -141,8 +195,14 @@ const showingNavigationDropdown = ref(false);
               </div>
             </div>
             <div class="mt-3 space-y-1">
-              <ResponsiveNavLink :href="route('profile.edit')">Profile</ResponsiveNavLink>
-              <ResponsiveNavLink :href="route('logout')" method="post" as="button">
+              <ResponsiveNavLink :href="route('profile.edit')"
+                >Profile</ResponsiveNavLink
+              >
+              <ResponsiveNavLink
+                :href="route('logout')"
+                method="post"
+                as="button"
+              >
                 Log Out
               </ResponsiveNavLink>
             </div>
