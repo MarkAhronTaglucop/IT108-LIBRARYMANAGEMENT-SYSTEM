@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('copies', function (Blueprint $table) {
-            $table->id('copy_id'); // Custom primary key
+            $table->id(); // Custom primary key
             $table->foreignId('book_id')
-                  ->constrained('books', 'book_id') // Reference 'book_id' in 'books'
+                  ->constrained('books', 'id') // Reference 'book_id' in 'books'
                   ->onDelete('cascade'); // Handle cascading deletes
             $table->date('date_encoded')->default(now());
             $table->string('status', 50);

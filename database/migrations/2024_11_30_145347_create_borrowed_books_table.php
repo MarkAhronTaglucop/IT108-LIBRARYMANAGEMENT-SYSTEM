@@ -17,7 +17,7 @@ return new class extends Migration
                   ->constrained('users', 'id') // Reference 'borrower_id'
                   ->onDelete('cascade'); // Handle cascading deletes
             $table->foreignId('copy_id')
-                  ->constrained('copies', 'copy_id') // Reference 'copy_id'
+                  ->constrained('copies', 'id') // Reference 'copy_id'
                   ->onDelete('cascade');
             $table->date('date_borrowed');
             $table->date('return_date');

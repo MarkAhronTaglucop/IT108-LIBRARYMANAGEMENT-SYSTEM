@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('books', function (Blueprint $table) {
-            $table->id('book_id'); // Custom primary key
+            $table->id(); // Custom primary key
             $table->string('title', 255);
             $table->string('category', 50);
             $table->string('genre', 50);
             $table->date('year_published');
             $table->foreignId('author_id')
-                  ->constrained('authors', 'author_id') // Reference the correct column
+                  ->constrained('authors', 'id') // Reference the correct column
                   ->onDelete('cascade'); // Handle cascading deletes
             $table->timestamps();
         });
