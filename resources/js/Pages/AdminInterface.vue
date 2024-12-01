@@ -172,7 +172,7 @@ const currentFunctionalityComponent = computed(() => {
             <p class="text-sm lg:text-base text-gray-600">
               {{ $page.props.auth.user.email }}
             </p>
-            <p class="text-sm lg:text-base text-gray-500">
+            <p class="font-bold text-sm lg:text-base text-gray-500">
               {{ getRole($page.props.auth.user.role_id) }}
             </p>
           </div>

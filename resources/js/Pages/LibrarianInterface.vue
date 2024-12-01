@@ -3,10 +3,21 @@ import { ref, computed } from "vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, router } from "@inertiajs/vue3";
 import { LayoutDashboardIcon, EyeIcon, PlusIcon } from "lucide-vue-next";
-
+//props
+const props = defineProps({
+  users: Array,
+  roles: Array,
+});
+// Reactive state for users
+const users = ref([...props.users]);
+//to get the role based on user id
+const getRole = (roleId) => {
+  const role = props.roles.find((role) => role.id === roleId);
+  return role ? role.user_type : "Unknown";
+};
+//user profile state
 const user = ref({
   avatar: "/images/image.png",
-  role: "Librarian",
 });
 
 const searchQuery = ref("");
@@ -89,7 +100,7 @@ const deleteBook = (book) => {
           <div class="text-center">
             <h2 class="text-lg lg:text-2xl font-bold text-gray-800">{{ $page.props.auth.user.name }}</h2>
             <p class="text-sm lg:text-base text-gray-600">{{ $page.props.auth.user.email }}</p>
-            <p class="text-sm lg:text-base text-gray-500">{{ user.role }}</p>
+            <p class="font-bold text-sm lg:text-base text-gray-500">{{ getRole($page.props.auth.user.role_id) }}</p>
           </div>
         </div>
       </aside>
