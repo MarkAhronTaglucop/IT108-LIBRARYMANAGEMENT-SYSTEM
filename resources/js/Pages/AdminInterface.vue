@@ -227,7 +227,7 @@ const currentFunctionalityComponent = computed(() => {
                   <td class="px-4 lg:px-6 py-3 whitespace-nowrap">
                     {{ getRole(userviews.role_id) }}
                   </td>
-                  <td class="px-4 lg:px-6 py-3 whitespace-nowrap space-x-2">
+                  <td class="px-4 lg:px-6 py-3 whitespace-nowrap space-x-3">
                     <button
                     v-if="getRole(userviews.role_id) !== 'admin'"
                       @click="editUser(userviews)"
