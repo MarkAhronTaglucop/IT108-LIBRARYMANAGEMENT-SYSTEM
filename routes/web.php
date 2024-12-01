@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\LibrarianController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +17,9 @@ Route::get('/', function () {
     ]);
 });
 
+
+
+
 Route::middleware(['auth', 'setDB'])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render(
@@ -23,6 +27,7 @@ Route::middleware(['auth', 'setDB'])->group(function () {
         );
     })->name('dashboard');
 
+    Route::get('/user-dashboard', [UserController::class, 'users'])->name('user-dashboard');
 
     Route::middleware(['librarian'])->group(function () {
         Route::get('/librarian-dashboard', [LibrarianController::class, 'users'])->name('librarian-dashboard');
@@ -37,12 +42,6 @@ Route::middleware(['auth', 'setDB'])->group(function () {
 
 
 
-
-
-
-Route::get('/user-interface', function () {
-    return Inertia::render('UserInterface');
-})->middleware(['auth', 'verified'])->name('user-interface');
 
 
 

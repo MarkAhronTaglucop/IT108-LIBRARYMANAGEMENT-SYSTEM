@@ -36,8 +36,8 @@ const showingNavigationDropdown = ref(false);
                   Dashboard
                 </NavLink>
                 <NavLink
-                  :href="route('user-interface')"
-                  :active="route().current('user-interface')"
+                  :href="route('user-dashboard')"
+                  :active="route().current('user-dashboard')"
                 >
                   Library
                 </NavLink>
@@ -160,8 +160,8 @@ const showingNavigationDropdown = ref(false);
               Dashboard
             </ResponsiveNavLink>
             <ResponsiveNavLink
-              :href="route('user-interface')"
-              :active="route().current('user-interface')"
+              :href="route('user-dashboard')"
+              :active="route().current('user-dashboard')"
             >
               Library Management
             </ResponsiveNavLink>
