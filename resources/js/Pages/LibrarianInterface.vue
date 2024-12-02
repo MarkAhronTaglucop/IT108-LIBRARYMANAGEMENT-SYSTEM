@@ -216,6 +216,7 @@ const deleteBook = (book) => {
                   <p class="text-gray-500">{{ book.author_name }}</p>
                   <p class="text-gray-500"> <strong>Category:</strong> {{ book.category }}</p> <!-- Display category -->
                   <p class="text-gray-500"> <strong>Year Published:</strong> {{ book.year_published }}</p> <!-- Display year published -->
+                  <p class="text-gray-500"> <strong>Number of copies:</strong> {{ book.num_copies }}</p> 
                 </div>
                 <div class="flex space-x-2">
                   <button

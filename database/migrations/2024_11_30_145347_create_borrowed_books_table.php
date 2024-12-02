@@ -21,7 +21,7 @@ return new class extends Migration
                   ->onDelete('cascade');
             $table->date('date_borrowed');
             $table->date('return_date');
-            $table->date('date_returned')->nullable();
+            $table->boolean('is_returned')->false;
             $table->timestamps();
         });
     }
