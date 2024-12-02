@@ -14,14 +14,17 @@ return new class extends Migration
         Schema::create('borrowed_books', function (Blueprint $table) {
             $table->id(); // Default primary key
             $table->foreignId('users_id')
-                  ->constrained('users', 'id') // Reference 'borrower_id'
-                  ->onDelete('cascade'); // Handle cascading deletes
+                ->constrained('users', 'id') // Reference 'borrower_id'
+                ->onDelete('cascade'); // Handle cascading deletes
             $table->foreignId('copy_id')
-                  ->constrained('copies', 'id') // Reference 'copy_id'
-                  ->onDelete('cascade');
+                ->constrained('copies', 'id') // Reference 'copy_id'
+                ->onDelete('cascade');
+            $table->foreignId('status_id')
+                ->constrained('status', 'id') // Reference 'copy_id'
+                ->onDelete('cascade')
+                ->default(1);
             $table->date('date_borrowed');
             $table->date('return_date');
-            $table->boolean('is_returned')->false;
             $table->timestamps();
         });
     }

@@ -40,7 +40,7 @@ const borrowLogs = ref([]);
 
 // Borrow a book and log it
 const borrowBook = (book) => {
-  borrowLogs.value.push(`Borrowed: ${book.title} by ${book.author}`);
+  borrowLogs.value.push(`Borrowed: ${book.title} by:     ${book.author_name}`);
 };
 </script>
 
