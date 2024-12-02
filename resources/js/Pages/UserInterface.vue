@@ -8,6 +8,7 @@ import { LayoutDashboardIcon, EyeIcon } from "lucide-vue-next";
 const props = defineProps({
   users: Array,
   roles: Array,
+  books: Array,
 });
 // Reactive state for users
 const users = ref([...props.users]);
@@ -21,51 +22,25 @@ const user = ref({
     avatar: "/images/image.png",
 });
 
-const functionalities = ref([
-    {
-        id: "overview",
-        name: "View",
-        icon: EyeIcon,
-        component: () => ({}),
-    },
-]);
-
-const selectedFunctionality = ref("overview");
-
-const selectFunctionality = (id) => {
-    selectedFunctionality.value = id;
-};
-
-const currentFunctionalityComponent = computed(() => {
-    const functionality = functionalities.value.find(
-        (f) => f.id === selectedFunctionality.value
-    );
-    return functionality ? functionality.component : null;
-});
-
 // New state for search query
 const searchQuery = ref("");
 
-// Sample books data
-const books = ref([
-    { title: "The Great Gatsby", author: "F. Scott Fitzgerald" },
-    { title: "To Kill a Mockingbird", author: "Harper Lee" },
-    { title: "1984", author: "George Orwell" },
-]);
-
-// State for borrowed logs
-const borrowLogs = ref([]);
-
-// Filtered books based on the search query
+// Filtered books based on search query
 const filteredBooks = computed(() => {
-    return books.value.filter((book) =>
-        book.title.toLowerCase().includes(searchQuery.value.toLowerCase())
-    );
+  const booksArray = props.books || []; // Default to an empty array
+  return booksArray.filter((book) =>
+    book.title.toLowerCase().includes(searchQuery.value.toLowerCase())
+  );
 });
 
-// Borrow function to add log
+
+
+// Borrow log state
+const borrowLogs = ref([]);
+
+// Borrow a book and log it
 const borrowBook = (book) => {
-    borrowLogs.value.push(`Borrowed: ${book.title} by ${book.author}`);
+  borrowLogs.value.push(`Borrowed: ${book.title} by ${book.author}`);
 };
 </script>
 
@@ -122,7 +97,7 @@ const borrowBook = (book) => {
 
                 <!-- Search Results Display -->
                 <div
-                    class="bg-gray-100 p-4 md:p-6 rounded-lg shadow-md border border-black mb-6"
+                    class="bg-gray-100 p-4 md:p-6 rounded-lg shadow-md border border-black mb-6 max-h-64 overflow-y-auto"
                 >
                     <h3 class="text-xl font-semibold text-gray-800">
                         Search Results
@@ -130,12 +105,22 @@ const borrowBook = (book) => {
                     <ul class="mt-4 space-y-2">
                         <li
                             v-for="book in filteredBooks"
-                            :key="book.title"
+                            :key="book.id"
                             class="p-4 bg-white rounded-md shadow-md flex justify-between items-center"
                         >
                             <div>
                                 <p class="font-semibold">{{ book.title }}</p>
-                                <p class="text-gray-500">{{ book.author }}</p>
+                                <p class="text-gray-500">{{ book.author_name }}</p>
+
+                                <!-- Ge add sab nko apil ang Category ug Year Pub-->
+                                <p class="text-gray-400">
+                                    <strong>Category & Genre:</strong>
+                                    {{ book.category }}, {{ book.genre }}
+                                </p>
+                                <p class="text-gray-400">
+                                    <strong>Year Published:</strong>
+                                    {{ book.year_published }}
+                                </p>
                             </div>
                             <button
                                 @click="borrowBook(book)"
@@ -152,7 +137,7 @@ const borrowBook = (book) => {
 
                 <!-- Borrow Logs -->
                 <div
-                    class="bg-gray-100 p-4 md:p-6 rounded-lg shadow-md border border-black h-64 overflow-y-auto"
+                    class="bg-gray-100 p-4 md:p-6 rounded-lg shadow-md border border-black h-64 overflow-y-auto max-h-64 overflow-y-auto"
                 >
                     <h3 class="text-xl font-semibold text-gray-800">
                         Borrow Logs

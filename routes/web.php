@@ -27,7 +27,7 @@ Route::middleware(['auth', 'setDB'])->group(function () {
         );
     })->name('dashboard');
 
-    Route::get('/user-dashboard', [UserController::class, 'users'])->name('user-dashboard');
+    Route::get('/user-dashboard', [UserController::class, 'display_info'])->name('user-dashboard');
 
     Route::middleware(['librarian'])->group(function () {
         Route::get('/librarian-dashboard', [LibrarianController::class, 'users'])->name('librarian-dashboard');

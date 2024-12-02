@@ -118,30 +118,6 @@ const closeModal = () => {
   userForm.value = { id: null, name: "", email: "", role_id: "" };
 };
 
-const functionalities = ref([
-  { id: "overview", name: "View", icon: EyeIcon, component: () => ({}) },
-]);
-
-if (user.value.role === "Admin") {
-  functionalities.value.push(
-    { id: "insert", name: "Add", icon: PlusIcon, component: () => ({}) },
-    { id: "edit", name: "Edit", icon: EditIcon, component: () => ({}) },
-    { id: "delete", name: "Delete", icon: TrashIcon, component: () => ({}) }
-  );
-}
-
-const selectedFunctionality = ref("overview");
-
-const selectFunctionality = (id) => {
-  selectedFunctionality.value = id;
-};
-
-const currentFunctionalityComponent = computed(() => {
-  return (
-    functionalities.value.find((f) => f.id === selectedFunctionality.value)
-      ?.component || null
-  );
-});
 </script>
 
 <template>
@@ -189,7 +165,7 @@ const currentFunctionalityComponent = computed(() => {
         </h1>
 
         <!-- User Management -->
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="bg-white shadow-md rounded-lg max-h-80 overflow-y-auto">
           <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">

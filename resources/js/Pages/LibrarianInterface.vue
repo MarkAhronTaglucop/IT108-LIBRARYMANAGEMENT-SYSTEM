@@ -22,14 +22,43 @@ const user = ref({
 
 const searchQuery = ref("");
 const books = ref([
-  { title: "The Great Gatsby", author: "F. Scott Fitzgerald" },
-  { title: "To Kill a Mockingbird", author: "Harper Lee" },
-  { title: "1984", author: "George Orwell" },
+    {
+        title: "The Great Gatsby",
+        author: "F. Scott Fitzgerald",
+        category: "Classic",
+        yearPublished: 1925,
+    },
+    {
+        title: "To Kill a Mockingbird",
+        author: "Harper Lee",
+        category: "Fiction",
+        yearPublished: 1960,
+    },
+    {
+        title: "1984",
+        author: "George Orwell",
+        category: "Dystopian",
+        yearPublished: 1949,
+    },
+    {
+        title: "Moby-Dick",
+        author: "Herman Melville",
+        category: "Adventure",
+        yearPublished: 1851,
+    },
+    {
+        title: "Pride and Prejudice",
+        author: "Jane Austen",
+        category: "Romance",
+        yearPublished: 1813,
+    },
 ]);
 
 const addLogs = ref([]);
 const newBookTitle = ref("");
 const newBookAuthor = ref("");
+const newBookCategory = ref(""); // Added category input field
+const newBookYearPub = ref("");  // Added year published input field
 const showAddBookModal = ref(false);
 const editingBook = ref(null); // Variable to hold the book being edited
 
@@ -45,6 +74,8 @@ const saveBook = () => {
     // Editing an existing book
     editingBook.value.title = newBookTitle.value;
     editingBook.value.author = newBookAuthor.value;
+    editingBook.value.category = newBookCategory.value; // Update category
+    editingBook.value.yearPub = newBookYearPub.value;  // Update year published
     addLogs.value.push(`Edited: ${newBookTitle.value} by ${newBookAuthor.value}`);
   } else {
     // Adding a new book
@@ -55,6 +86,8 @@ const saveBook = () => {
   // Reset fields and close modal
   newBookTitle.value = "";
   newBookAuthor.value = "";
+  newBookCategory.value = ""; // Reset category
+  newBookYearPub.value = "";  // Reset year published
   editingBook.value = null;
   showAddBookModal.value = false;
 };
@@ -64,6 +97,8 @@ const editBook = (book) => {
   editingBook.value = book;
   newBookTitle.value = book.title;
   newBookAuthor.value = book.author;
+  newBookCategory.value = book.category;  // Populate category
+  newBookYearPub.value = book.yearPub;    // Populate year published
   showAddBookModal.value = true;
 };
 
@@ -128,26 +163,25 @@ const deleteBook = (book) => {
           <div class="bg-white p-6 rounded-lg shadow-lg w-96">
             <h3 class="text-xl font-bold mb-4">{{ editingBook ? "Edit Book" : "Add New Book" }}</h3>
 
-            <!-- Book Title -->
+            <!-- Book Informations -->
             <div class="mb-4">
               <label class="block text-sm font-medium text-gray-700">Book Title</label>
-              <input
-                v-model="newBookTitle"
-                type="text"
-                class="mt-1 p-2 w-full border rounded"
-                placeholder="Enter book title"
-              />
+              <input v-model="newBookTitle" type="text" class="mt-1 p-2 w-full border rounded" placeholder="Enter book title" />
             </div>
 
-            <!-- Author -->
             <div class="mb-4">
               <label class="block text-sm font-medium text-gray-700">Author</label>
-              <input
-                v-model="newBookAuthor"
-                type="text"
-                class="mt-1 p-2 w-full border rounded"
-                placeholder="Enter author's name"
-              />
+              <input v-model="newBookAuthor" type="text" class="mt-1 p-2 w-full border rounded" placeholder="Enter author's name" />
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700">Category</label>
+              <input v-model="newBookCategory" type="text" class="mt-1 p-2 w-full border rounded" placeholder="Enter book category" />
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700">Year Published</label>
+              <input v-model="newBookYearPub" type="number" class="mt-1 p-2 w-full border rounded" placeholder="Enter publication year" />
             </div>
 
             <!-- Modal Buttons -->
@@ -169,7 +203,7 @@ const deleteBook = (book) => {
         </div>
 
         <!-- Search Results Display -->
-        <div class="bg-gray-100 p-4 md:p-6 rounded-lg shadow-md border border-black mb-6">
+        <div class="bg-gray-100 p-4 md:p-6 rounded-lg shadow-md border border-black mb-6 max-h-64 overflow-y-auto">
           <h3 class="text-xl font-semibold text-gray-800">Search Results</h3>
           <ul class="mt-4 space-y-2">
             <li v-for="book in filteredBooks" :key="book.title" class="p-4 bg-white rounded-md shadow-md">
@@ -177,6 +211,8 @@ const deleteBook = (book) => {
                 <div>
                   <p class="font-semibold">{{ book.title }}</p>
                   <p class="text-gray-500">{{ book.author }}</p>
+                  <p class="text-gray-500"> <strong>Category:</strong> {{ book.category }}</p> <!-- Display category -->
+                  <p class="text-gray-500"> <strong>Year Published:</strong> {{ book.yearPub }}</p> <!-- Display year published -->
                 </div>
                 <div class="flex space-x-2">
                   <button
@@ -199,7 +235,7 @@ const deleteBook = (book) => {
         </div>
 
         <!-- Add Logs -->
-        <div class="bg-gray-100 p-4 md:p-6 rounded-lg shadow-md border border-black h-64 overflow-y-auto">
+        <div class="bg-gray-100 p-4 md:p-6 rounded-lg shadow-md border border-black h-64 overflow-y-auto max-h-64 max-h-64 overflow-y-auto">
           <h3 class="text-xl font-semibold text-gray-800">Add Logs</h3>
           <ul class="mt-4 space-y-2">
             <li v-for="(log, index) in addLogs" :key="index" class="p-2 bg-white rounded-md shadow-md">

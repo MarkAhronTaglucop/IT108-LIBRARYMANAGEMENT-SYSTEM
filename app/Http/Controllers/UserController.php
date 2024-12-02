@@ -9,10 +9,17 @@ use Inertia\Inertia;
 
 class UserController extends Controller
 {
-    public function users()
+
+    public function display_info()
     {
         $users = User::with('role')->get();
         $roles = DB::table('roles')->get();
-        return Inertia::render('UserInterface', ['users' => $users, 'roles' => $roles]);
+        $books = DB::select('SELECT * FROM view_books');
+
+        return Inertia::render('UserInterface', [
+            'users' => $users,
+            'roles' => $roles,
+            'books' => $books
+        ]);
     }
 }
