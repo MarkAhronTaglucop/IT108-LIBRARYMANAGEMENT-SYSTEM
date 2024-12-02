@@ -26,12 +26,14 @@ Route::middleware(['auth', 'setDB'])->group(function () {
             'Dashboard'
         );
     })->name('dashboard');
-
     Route::get('/user-dashboard', [UserController::class, 'display_info'])->name('user-dashboard');
 
+
+
     Route::middleware(['librarian'])->group(function () {
-        Route::get('/librarian-dashboard', [LibrarianController::class, 'users'])->name('librarian-dashboard');
+        Route::get('/librarian-dashboard', [LibrarianController::class, 'display_info'])->name('librarian-dashboard');
     });
+
 
     Route::middleware(['admin'])->group(function () {
         Route::get('/admin-dashboard', [AdminController::class, 'users'])->name('admin-dashboard');

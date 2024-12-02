@@ -7,6 +7,7 @@ import { LayoutDashboardIcon, EyeIcon, PlusIcon } from "lucide-vue-next";
 const props = defineProps({
   users: Array,
   roles: Array,
+  books: Array,
 });
 // Reactive state for users
 const users = ref([...props.users]);
@@ -19,6 +20,13 @@ const getRole = (roleId) => {
 const user = ref({
   avatar: "/images/image.png",
 });
+// Filtered books based on search query
+const filteredBooks = computed(() => {
+  const booksArray = props.books || []; // Default to an empty array
+  return booksArray.filter((book) =>
+    book.title.toLowerCase().includes(searchQuery.value.toLowerCase())
+  );
+});
 
 const searchQuery = ref("");
 const books = ref([
@@ -30,7 +38,7 @@ const books = ref([
     },
     {
         title: "To Kill a Mockingbird",
-        author: "Harper Lee",
+        author: "Harper Lee", 
         category: "Fiction",
         yearPublished: 1960,
     },
@@ -62,11 +70,6 @@ const newBookYearPub = ref("");  // Added year published input field
 const showAddBookModal = ref(false);
 const editingBook = ref(null); // Variable to hold the book being edited
 
-const filteredBooks = computed(() => {
-  return books.value.filter((book) =>
-    book.title.toLowerCase().includes(searchQuery.value.toLowerCase())
-  );
-});
 
 // Add or edit book function
 const saveBook = () => {
@@ -206,13 +209,13 @@ const deleteBook = (book) => {
         <div class="bg-gray-100 p-4 md:p-6 rounded-lg shadow-md border border-black mb-6 max-h-64 overflow-y-auto">
           <h3 class="text-xl font-semibold text-gray-800">Search Results</h3>
           <ul class="mt-4 space-y-2">
-            <li v-for="book in filteredBooks" :key="book.title" class="p-4 bg-white rounded-md shadow-md">
+            <li v-for="book in filteredBooks" :key="book.id" class="p-4 bg-white rounded-md shadow-md">
               <div class="flex justify-between">
                 <div>
                   <p class="font-semibold">{{ book.title }}</p>
-                  <p class="text-gray-500">{{ book.author }}</p>
+                  <p class="text-gray-500">{{ book.author_name }}</p>
                   <p class="text-gray-500"> <strong>Category:</strong> {{ book.category }}</p> <!-- Display category -->
-                  <p class="text-gray-500"> <strong>Year Published:</strong> {{ book.yearPub }}</p> <!-- Display year published -->
+                  <p class="text-gray-500"> <strong>Year Published:</strong> {{ book.year_published }}</p> <!-- Display year published -->
                 </div>
                 <div class="flex space-x-2">
                   <button

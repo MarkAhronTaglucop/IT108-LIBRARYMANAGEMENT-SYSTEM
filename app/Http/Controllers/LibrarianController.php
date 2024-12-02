@@ -9,10 +9,16 @@ use Inertia\Inertia;
 
 class LibrarianController extends Controller
 {
-    public function users()
+    public function display_info()
     {
         $users = User::with('role')->get();
         $roles = DB::table('roles')->get();
-        return Inertia::render('LibrarianInterface', ['users' => $users, 'roles' => $roles]);
+        $books = DB::select('SELECT * FROM view_books');
+
+        return Inertia::render('LibrarianInterface', [
+            'users' => $users,
+            'roles' => $roles,
+            'books' => $books
+        ]);
     }
 }
