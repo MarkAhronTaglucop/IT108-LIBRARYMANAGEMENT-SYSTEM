@@ -27,11 +27,14 @@ Route::middleware(['auth', 'setDB'])->group(function () {
         );
     })->name('dashboard');
     Route::get('/user-dashboard', [UserController::class, 'display_info'])->name('user-dashboard');
+    Route::get('/user-dashboard/search', [UserController::class, 'search'])->name('user.search');
+
 
 
 
     Route::middleware(['librarian'])->group(function () {
         Route::get('/librarian-dashboard', [LibrarianController::class, 'display_info'])->name('librarian-dashboard');
+        Route::get('/librarian-dashboard/search', [LibrarianController::class, 'search'])->name('librarian.search');
     });
 
 

@@ -1,119 +1,127 @@
 <script setup>
-import { ref, computed } from "vue";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { ref, computed, watch } from "vue";
 import { Head, router } from "@inertiajs/vue3";
+import { debounce } from "lodash";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { LayoutDashboardIcon, EyeIcon, PlusIcon } from "lucide-vue-next";
-//props
+
+// Props
 const props = defineProps({
   users: Array,
   roles: Array,
   books: Array,
+  searchedbooks: Array,
 });
-// Reactive state for users
+
+// Reactive states
 const users = ref([...props.users]);
-//to get the role based on user id
+const searchQuery = ref("");
+const filteredBooks = ref([]); // Store the books after filtering
+const cachedRoles = ref([...props.roles]);
+
+// Initialize filteredBooks safely
+filteredBooks.value = Array.isArray(props.books) ? [...props.books] : [];
+
+// Get role function
 const getRole = (roleId) => {
-  const role = props.roles.find((role) => role.id === roleId);
+  const role = cachedRoles.value.find((role) => role.id === roleId);
   return role ? role.user_type : "Unknown";
 };
-//user profile state
+
+// User profile state
 const user = ref({
   avatar: "/images/image.png",
 });
-// Filtered books based on search query
-const filteredBooks = computed(() => {
-  const booksArray = props.books || []; // Default to an empty array
-  return booksArray.filter((book) =>
-    book.title.toLowerCase().includes(searchQuery.value.toLowerCase())
-  );
+
+// Debounced search function
+const debouncedSearch = debounce(async (newQuery) => {
+  if (newQuery.trim()) {
+    // Perform backend search only if query is not empty
+    await router.get(
+      route("librarian.search"),
+      { searchQuery: newQuery },
+      { preserveState: true, preserveScroll: true }
+    );
+  }
+}, 300);
+
+// Watch for changes in searchQuery
+watch(searchQuery, (newQuery, oldQuery) => {
+  if (!newQuery.trim()) {
+    // Reset to all books when the query is empty
+    filteredBooks.value = Array.isArray(props.books) ? [...props.books] : [];
+    router.get(route("librarian-dashboard"), {}, { preserveState: true }); // Clear query params
+  } else if (oldQuery.length === 1 && newQuery.length === 0) {
+    // Handle fast deletion to prevent "t" from persisting
+    debouncedSearch.cancel(); // Cancel any pending debounce calls
+    filteredBooks.value = Array.isArray(props.books) ? [...props.books] : [];
+    router.get(route("librarian-dashboard"), {}, { preserveState: true });
+  } else {
+    debouncedSearch(newQuery);
+  }
 });
 
-const searchQuery = ref("");
-const books = ref([
-    {
-        title: "The Great Gatsby",
-        author: "F. Scott Fitzgerald",
-        category: "Classic",
-        yearPublished: 1925,
-    },
-    {
-        title: "To Kill a Mockingbird",
-        author: "Harper Lee", 
-        category: "Fiction",
-        yearPublished: 1960,
-    },
-    {
-        title: "1984",
-        author: "George Orwell",
-        category: "Dystopian",
-        yearPublished: 1949,
-    },
-    {
-        title: "Moby-Dick",
-        author: "Herman Melville",
-        category: "Adventure",
-        yearPublished: 1851,
-    },
-    {
-        title: "Pride and Prejudice",
-        author: "Jane Austen",
-        category: "Romance",
-        yearPublished: 1813,
-    },
-]);
+// Watch for backend updates to searchedbooks
+watch(
+  () => props.searchedbooks,
+  (newBooks) => {
+    filteredBooks.value =
+      Array.isArray(newBooks) && newBooks.length > 0
+        ? newBooks
+        : Array.isArray(props.books)
+        ? [...props.books]
+        : [];
+  },
+  { immediate: true }
+);
 
+// Add, edit, and delete functionalities remain untouched
 const addLogs = ref([]);
 const newBookTitle = ref("");
 const newBookAuthor = ref("");
 const newBookCategory = ref(""); // Added category input field
 const newBookYearPub = ref("");  // Added year published input field
 const showAddBookModal = ref(false);
-const editingBook = ref(null); // Variable to hold the book being edited
+const editingBook = ref(null);
 
-
-// Add or edit book function
 const saveBook = () => {
   if (editingBook.value) {
-    // Editing an existing book
     editingBook.value.title = newBookTitle.value;
     editingBook.value.author = newBookAuthor.value;
-    editingBook.value.category = newBookCategory.value; // Update category
-    editingBook.value.yearPub = newBookYearPub.value;  // Update year published
+    editingBook.value.category = newBookCategory.value;
+    editingBook.value.yearPub = newBookYearPub.value;
     addLogs.value.push(`Edited: ${newBookTitle.value} by ${newBookAuthor.value}`);
   } else {
-    // Adding a new book
-    books.value.push({ title: newBookTitle.value, author: newBookAuthor.value });
+    filteredBooks.value.push({ title: newBookTitle.value, author: newBookAuthor.value });
     addLogs.value.push(`Added: ${newBookTitle.value} by ${newBookAuthor.value}`);
   }
 
-  // Reset fields and close modal
   newBookTitle.value = "";
   newBookAuthor.value = "";
-  newBookCategory.value = ""; // Reset category
-  newBookYearPub.value = "";  // Reset year published
+  newBookCategory.value = "";
+  newBookYearPub.value = "";
   editingBook.value = null;
   showAddBookModal.value = false;
 };
 
-// Edit book function to populate the modal with the book's details
 const editBook = (book) => {
   editingBook.value = book;
   newBookTitle.value = book.title;
   newBookAuthor.value = book.author;
-  newBookCategory.value = book.category;  // Populate category
-  newBookYearPub.value = book.yearPub;    // Populate year published
+  newBookCategory.value = book.category;
+  newBookYearPub.value = book.yearPub;
   showAddBookModal.value = true;
 };
 
-// Delete book function
 const deleteBook = (book) => {
-  const index = books.value.indexOf(book);
+  const index = filteredBooks.value.indexOf(book);
   if (index !== -1) {
-    books.value.splice(index, 1);
+    filteredBooks.value.splice(index, 1);
     addLogs.value.push(`Deleted: ${book.title} by ${book.author}`);
   }
 };
 </script>
+
 
 <template>
   <Head title="Dashboard" />

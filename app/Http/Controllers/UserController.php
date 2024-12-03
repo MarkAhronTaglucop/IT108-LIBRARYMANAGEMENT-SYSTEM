@@ -22,4 +22,28 @@ class UserController extends Controller
             'books' => $books
         ]);
     }
+
+    public function search(Request $request)
+    {
+        $searchQuery = $request->input('searchQuery', '');
+
+        if (empty($searchQuery)) {
+            return Inertia::render('UserInterface', [
+                'searchedbooks' => []
+            ]);
+        }
+
+        try {
+            $searchedbooks = DB::select('SELECT * FROM SearchBooksByTitle(?)', [$searchQuery]);
+        } catch (\Exception $e) {
+            return Inertia::render('UserInterface', [
+                'searchedbooks' => [],
+                'error' => $e->getMessage() // Optional: Include error for debugging
+            ]);
+        }
+
+        return Inertia::render('UserInterface', [
+            'searchedbooks' => $searchedbooks
+        ]);
+    }
 }

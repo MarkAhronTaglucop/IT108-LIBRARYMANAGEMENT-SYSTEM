@@ -21,4 +21,28 @@ class LibrarianController extends Controller
             'books' => $books
         ]);
     }
+
+    public function search(Request $request)
+    {
+        $searchQuery = $request->input('searchQuery', '');
+
+        if (empty($searchQuery)) {
+            return Inertia::render('LibrarianInterface', [
+                'searchedbooks' => []
+            ]);
+        }
+
+        try {
+            $searchedbooks = DB::select('SELECT * FROM SearchBooksByTitle(?)', [$searchQuery]);
+        } catch (\Exception $e) {
+            return Inertia::render('LibrarianInterface', [
+                'searchedbooks' => [],
+                'error' => $e->getMessage()
+            ]);
+        }
+
+        return Inertia::render('LibrarianInterface', [
+            'searchedbooks' => $searchedbooks
+        ]);
+    }
 }

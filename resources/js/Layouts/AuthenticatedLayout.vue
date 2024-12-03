@@ -163,7 +163,7 @@ const showingNavigationDropdown = ref(false);
               :href="route('user-dashboard')"
               :active="route().current('user-dashboard')"
             >
-              Library Management
+              Library
             </ResponsiveNavLink>
             <ResponsiveNavLink
               v-if="
@@ -173,7 +173,7 @@ const showingNavigationDropdown = ref(false);
               :href="route('librarian-dashboard')"
               :active="route().current('librarian-dashboard')"
             >
-              Librarian Management
+              Library Management
             </ResponsiveNavLink>
             <ResponsiveNavLink
               v-if="$page.props.auth.user.role_id === 3"
