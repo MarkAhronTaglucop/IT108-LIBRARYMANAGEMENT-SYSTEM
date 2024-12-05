@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import { Head, router } from "@inertiajs/vue3";
 import { debounce } from "lodash";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
@@ -11,12 +11,18 @@ const props = defineProps({
   roles: Array,
   books: Array,
   searchedbooks: Array,
+  borrowLogs: Array,
+  AcceptingLogs: Array,
+  acceptlogs: Array,
 });
 
 // Reactive states
+
+const logs = ref([...props.borrowLogs]);
+const acceptlogs = ref([...props.AcceptingLogs]);
 const users = ref([...props.users]);
 const searchQuery = ref("");
-const filteredBooks = ref([]); // Store the books after filtering
+const filteredBooks = ref([]);
 const cachedRoles = ref([...props.roles]);
 
 // Initialize filteredBooks safely
@@ -36,7 +42,6 @@ const user = ref({
 // Debounced search function
 const debouncedSearch = debounce(async (newQuery) => {
   if (newQuery.trim()) {
-    // Perform backend search only if query is not empty
     await router.get(
       route("librarian.search"),
       { searchQuery: newQuery },
@@ -48,12 +53,10 @@ const debouncedSearch = debounce(async (newQuery) => {
 // Watch for changes in searchQuery
 watch(searchQuery, (newQuery, oldQuery) => {
   if (!newQuery.trim()) {
-    // Reset to all books when the query is empty
     filteredBooks.value = Array.isArray(props.books) ? [...props.books] : [];
-    router.get(route("librarian-dashboard"), {}, { preserveState: true }); // Clear query params
+    router.get(route("librarian-dashboard"), {}, { preserveState: true });
   } else if (oldQuery.length === 1 && newQuery.length === 0) {
-    // Handle fast deletion to prevent "t" from persisting
-    debouncedSearch.cancel(); // Cancel any pending debounce calls
+    debouncedSearch.cancel();
     filteredBooks.value = Array.isArray(props.books) ? [...props.books] : [];
     router.get(route("librarian-dashboard"), {}, { preserveState: true });
   } else {
@@ -75,59 +78,133 @@ watch(
   { immediate: true }
 );
 
-// Add, edit, and delete functionalities remain untouched
-const addLogs = ref([]);
-const newBookTitle = ref("");
-const newBookAuthor = ref("");
-const newBookCategory = ref(""); // Added category input field
-const newBookYearPub = ref("");  // Added year published input field
-const showAddBookModal = ref(false);
-const editingBook = ref(null);
+onMounted(() => {
+  console.log("Borrow Logs:", props.borrowLogs);
+  console.log("Accepting Logs:", props.AcceptingLogs);
+});
 
-const saveBook = () => {
-  if (editingBook.value) {
-    editingBook.value.title = newBookTitle.value;
-    editingBook.value.author = newBookAuthor.value;
-    editingBook.value.category = newBookCategory.value;
-    editingBook.value.yearPub = newBookYearPub.value;
-    addLogs.value.push(`Edited: ${newBookTitle.value} by ${newBookAuthor.value}`);
-  } else {
-    filteredBooks.value.push({ title: newBookTitle.value, author: newBookAuthor.value });
-    addLogs.value.push(`Added: ${newBookTitle.value} by ${newBookAuthor.value}`);
+// Method to delete a book
+function deleteBook(id) {
+  if (confirm("Are you sure you want to delete this book?")) {
+    router.post(route("librarian.destroy", { id }), {
+      onSuccess: () => {
+        window.location.reload();
+        console.log("Book deleted successfully!");
+      },
+      onError: (errors) => {
+        console.error("Failed to delete book:", errors);
+      },
+    });
+  }
+}
+// Add, edit, and delete functionalities remain untouched
+const showEditBookModal = ref(false);
+const bookData = ref({
+  id: null,
+  title: "",
+  category: "",
+  genre: "",
+  year_published: "",
+  number_of_copies: 0,
+});
+
+// Regex pattern for validation
+const regexPattern = /^[a-zA-Z0-9\s.,!?&'-]+$/;
+
+// Open modal and populate form fields
+const editBook = (book) => {
+  bookData.value = { ...book };
+  showEditBookModal.value = true;
+};
+
+// Save changes to the book
+const saveBook = async () => {
+  // Validate fields
+  if (!regexPattern.test(bookData.value.title)) {
+    alert("Invalid title. Please use only allowed characters.");
+    return;
   }
 
-  newBookTitle.value = "";
-  newBookAuthor.value = "";
-  newBookCategory.value = "";
-  newBookYearPub.value = "";
-  editingBook.value = null;
-  showAddBookModal.value = false;
+  if (!regexPattern.test(bookData.value.category)) {
+    alert("Invalid category. Please use only allowed characters.");
+    return;
+  }
+
+  if (!regexPattern.test(bookData.value.genre)) {
+    alert("Invalid genre. Please use only allowed characters.");
+    return;
+  }
+
+  if (!bookData.value.year_published.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    alert("Invalid publication year. Please use the format YYYY-MM-DD.");
+    return;
+  }
+
+  if (
+    !Number.isInteger(bookData.value.number_of_copies) ||
+    bookData.value.number_of_copies < 0
+  ) {
+    alert("Invalid number of copies. Please enter a positive integer.");
+    return;
+  }
+
+  try {
+    await router.put(`/librarian-dashboard/update/${bookData.value.id}`, {
+      title: bookData.value.title,
+      category: bookData.value.category,
+      genre: bookData.value.genre,
+      year_published: bookData.value.year_published,
+      number_of_copies: bookData.value.number_of_copies,
+    });
+
+    window.location.reload();
+    alert("Book updated successfully!");
+  } catch (error) {
+    console.error("Failed to update book:", error);
+    alert("An error occurred while updating the book.");
+  } finally {
+    showEditBookModal.value = false; // Ensure modal closes
+  }
 };
 
-const editBook = (book) => {
-  editingBook.value = book;
-  newBookTitle.value = book.title;
-  newBookAuthor.value = book.author;
-  newBookCategory.value = book.category;
-  newBookYearPub.value = book.yearPub;
-  showAddBookModal.value = true;
-};
+const updateStatus = async (borrowedId, newStatusId) => {
+  console.log("Updating status for:", borrowedId, "with status:", newStatusId);
 
-const deleteBook = (book) => {
-  const index = filteredBooks.value.indexOf(book);
-  if (index !== -1) {
-    filteredBooks.value.splice(index, 1);
-    addLogs.value.push(`Deleted: ${book.title} by ${book.author}`);
+  try {
+    await router.patch(
+      route("librarian-dashboard.update", borrowedId),
+      { new_status_id: newStatusId },
+      {
+        preserveScroll: true,
+        onSuccess: () => {
+          console.log("Book status updated successfully!");
+        },
+        onError: (errors) => {
+          console.error("Validation errors:", errors);
+        },
+      }
+    );
+
+    // Update local logs to reflect the change
+    const logIndex = logs.value.findIndex((log) => log.id === borrowedId); // Use borrowedId for matching
+    // Refresh the page
+    window.location.reload();
+    if (logIndex !== -1) {
+      logs.value[logIndex].status_id = newStatusId;
+    }
+  } catch (error) {
+    console.error("Error updating status:", error);
   }
 };
 </script>
 
-
 <template>
-  <Head title="Dashboard" />
+  <Head title="Librarian Dashboard" />
   <AuthenticatedLayout>
     <template #header>
-      <h2 class="text-xl font-semibold leading-tight text-gray-800 flex items-center justify-between">
+      <h2
+        class="text-xl font-semibold leading-tight text-gray-800 flex items-center justify-between"
+      >
         <span>Library Management</span>
         <input
           v-model="searchQuery"
@@ -138,15 +215,27 @@ const deleteBook = (book) => {
       </h2>
     </template>
 
-    <div class="flex flex-col md:flex-row h-screen bg-gray-100">
+    <div class="flex flex-col md:flex-row h-1000px bg-gray-100">
       <!-- Sidebar -->
-      <aside class="w-full lg:w-1/4 bg-gray-200 p-4 lg:p-6 flex flex-col border-b lg:border-b-0 lg:border-r border-black">
+      <aside
+        class="w-full lg:w-1/4 bg-gray-200 p-4 lg:p-6 flex flex-col border-b lg:border-b-0 lg:border-r border-black"
+      >
         <div class="flex flex-col items-center mb-6">
-          <img :src="user.avatar" :alt="user.name" class="w-20 h-20 lg:w-24 lg:h-24 rounded-full border-2 border-black mb-2" />
+          <img
+            :src="user.avatar"
+            :alt="user.name"
+            class="w-20 h-20 lg:w-24 lg:h-24 rounded-full border-2 border-black mb-2"
+          />
           <div class="text-center">
-            <h2 class="text-lg lg:text-2xl font-bold text-gray-800">{{ $page.props.auth.user.name }}</h2>
-            <p class="text-sm lg:text-base text-gray-600">{{ $page.props.auth.user.email }}</p>
-            <p class="font-bold text-sm lg:text-base text-gray-500">{{ getRole($page.props.auth.user.role_id) }}</p>
+            <h2 class="text-lg lg:text-2xl font-bold text-gray-800">
+              {{ $page.props.auth.user.name }}
+            </h2>
+            <p class="text-sm lg:text-base text-gray-600">
+              {{ $page.props.auth.user.email }}
+            </p>
+            <p class="font-bold text-sm lg:text-base text-gray-500">
+              {{ getRole($page.props.auth.user.role_id) }}
+            </p>
           </div>
         </div>
       </aside>
@@ -170,29 +259,67 @@ const deleteBook = (book) => {
         </div>
 
         <!-- Modal for Adding or Editing Book -->
-        <div v-if="showAddBookModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+        <div
+          v-if="showEditBookModal"
+          class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center"
+        >
           <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h3 class="text-xl font-bold mb-4">{{ editingBook ? "Edit Book" : "Add New Book" }}</h3>
+            <h3 class="text-xl font-bold mb-4">Editing Book</h3>
 
             <!-- Book Informations -->
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Book Title</label>
-              <input v-model="newBookTitle" type="text" class="mt-1 p-2 w-full border rounded" placeholder="Enter book title" />
+              <label class="block text-sm font-medium text-gray-700">Book Title: </label>
+              <input
+                @input="validateInput('title', bookData.title)"
+                v-model="bookData.title"
+                type="text"
+                class="mt-1 p-2 w-full border rounded"
+                placeholder="Enter book title"
+              />
             </div>
 
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Author</label>
-              <input v-model="newBookAuthor" type="text" class="mt-1 p-2 w-full border rounded" placeholder="Enter author's name" />
+              <label class="block text-sm font-medium text-gray-700">Category:</label>
+              <input
+                @input="validateInput('category', bookData.category)"
+                v-model="bookData.category"
+                type="text"
+                class="mt-1 p-2 w-full border rounded"
+                placeholder="Enter book category"
+              />
+            </div>
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700">Genre:</label>
+              <input
+                @input="validateInput('category', bookData.genre)"
+                v-model="bookData.genre"
+                type="text"
+                class="mt-1 p-2 w-full border rounded"
+                placeholder="Enter Genre"
+              />
             </div>
 
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Category</label>
-              <input v-model="newBookCategory" type="text" class="mt-1 p-2 w-full border rounded" placeholder="Enter book category" />
+              <label class="block text-sm font-medium text-gray-700"
+                >Year Published: dd/mm/yyyy</label
+              >
+              <input
+                v-model="bookData.year_published"
+                type="date"
+                class="mt-1 p-2 w-full border rounded"
+                placeholder="Enter publication year"
+              />
             </div>
 
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Year Published</label>
-              <input v-model="newBookYearPub" type="number" class="mt-1 p-2 w-full border rounded" placeholder="Enter publication year" />
+              <label class="block text-sm font-medium text-gray-700">Copies:</label>
+              <input
+                @input="validateInput('category', bookData.num_copies)"
+                v-model="bookData.num_copies"
+                type="number"
+                class="mt-1 p-2 w-full border rounded"
+                placeholder="Enter new Copies"
+              />
             </div>
 
             <!-- Modal Buttons -->
@@ -201,11 +328,11 @@ const deleteBook = (book) => {
                 @click="saveBook"
                 class="px-4 py-2 bg-black text-white rounded hover:bg-neutral-700 transition mr-2"
               >
-                {{ editingBook ? "Save Changes" : "Add Book" }}
+                Save Changes
               </button>
               <button
-                @click="showAddBookModal = false"
-                class="px-4 py-2 bg-white  text-black rounded hover:bg-gray-300 transition"
+                @click="showEditBookModal = false"
+                class="px-4 py-2 bg-white text-black rounded hover:bg-gray-300 transition"
               >
                 Cancel
               </button>
@@ -214,17 +341,31 @@ const deleteBook = (book) => {
         </div>
 
         <!-- Search Results Display -->
-        <div class="bg-gray-100 p-4 md:p-6 rounded-lg shadow-md border border-black mb-6 max-h-64 overflow-y-auto">
+        <div
+          class="bg-gray-100 p-4 md:p-6 rounded-lg shadow-md border border-black mb-6 max-h-64 overflow-y-auto"
+        >
           <h3 class="text-xl font-semibold text-gray-800">Search Results</h3>
           <ul class="mt-4 space-y-2">
-            <li v-for="book in filteredBooks" :key="book.id" class="p-4 bg-white rounded-md shadow-md">
+            <li
+              v-for="book in filteredBooks"
+              :key="book.id"
+              class="p-4 bg-white rounded-md shadow-md"
+            >
               <div class="flex justify-between">
                 <div>
                   <p class="font-semibold">{{ book.title }}</p>
                   <p class="text-gray-500">{{ book.author_name }}</p>
-                  <p class="text-gray-500"> <strong>Category:</strong> {{ book.category }}</p> <!-- Display category -->
-                  <p class="text-gray-500"> <strong>Year Published:</strong> {{ book.year_published }}</p> <!-- Display year published -->
-                  <p class="text-gray-500"> <strong>Number of copies:</strong> {{ book.num_copies }}</p> 
+                  <p class="text-gray-500">
+                    <strong>Category:</strong> {{ book.category }}
+                  </p>
+                  <!-- Display category -->
+                  <p class="text-gray-500">
+                    <strong>Year Published:</strong> {{ book.year_published }}
+                  </p>
+                  <!-- Display year published -->
+                  <p class="text-gray-500">
+                    <strong>Number of copies:</strong> {{ book.num_copies }}
+                  </p>
                 </div>
                 <div class="flex space-x-2">
                   <button
@@ -246,14 +387,87 @@ const deleteBook = (book) => {
           <p v-if="filteredBooks.length === 0" class="text-gray-500">No books found.</p>
         </div>
 
-        <!-- Add Logs -->
-        <div class="bg-gray-100 p-4 md:p-6 rounded-lg shadow-md border border-black h-64 overflow-y-auto max-h-64 max-h-64 overflow-y-auto">
-          <h3 class="text-xl font-semibold text-gray-800">Add Logs</h3>
-          <ul class="mt-4 space-y-2">
-            <li v-for="(log, index) in addLogs" :key="index" class="p-2 bg-white rounded-md shadow-md">
-              {{ log }}
+        <div
+          class="mt-8 w-full p-4 md:p-8 bg-gray-100 rounded-lg shadow-md border border-black h-64 overflow-y-auto max-h-64"
+        >
+          <h4 class="text-lg font-semibold text-gray-700">Accepting Logs</h4>
+          <ul class="mt-2 space-y-2">
+            <li
+              v-for="(log, index) in acceptlogs"
+              :key="`accept-${index}` || log.borrowed_id"
+              class="flex justify-between items-center p-2 bg-white rounded-md shadow-md"
+            >
+              <div>
+                <p>
+                  <strong>Borrowed ID:</strong> {{ log.borrowed_id }}<br />
+                  <strong>Book:</strong> {{ log.book_title }}<br />
+                  <strong>Borrowed By:</strong> {{ log.user_name }}<br />
+                  <strong>Date Borrowed:</strong> {{ log.date_borrowed }}<br />
+                  <strong>Current Status:</strong> {{ log.current_status }}<br />
+                  <strong>Copy ID:</strong> {{ log.id }}<br />
+                  <strong>Return Date:</strong> {{ log.return_date || "N/A" }}<br />
+                </p>
+              </div>
+              <div class="flex gap-2">
+                <!-- Accept button -->
+                <button
+                  @click="updateStatus(log.borrowed_id, 2)"
+                  :disabled="log.current_status === 'accepted'"
+                  class="px-3 py-1 text-sm font-medium text-white bg-green-500 rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Accept
+                </button>
+                <!-- Returned button -->
+                <button
+                  @click="updateStatus(log.borrowed_id, 3)"
+                  :disabled="log.current_status === 'pending'"
+                  class="px-3 py-1 text-sm font-medium text-white bg-blue-500 rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Returned
+                </button>
+              </div>
             </li>
           </ul>
+          <p v-if="acceptlogs.length === 0" class="text-gray-500">
+            No book borrowing logs found.
+          </p>
+        </div>
+
+        <!-- Borrowed Logs -->
+
+        <div
+          class="mt-8 bg-gray-100 p-4 md:p-6 rounded-lg shadow-md border border-black h-64 max-h-64 overflow-y-auto"
+        >
+          <h3 class="text-xl font-semibold text-gray-800">Borrow Logs</h3>
+          <ul class="mt-4 space-y-2">
+            <li
+              v-for="log in logs"
+              :key="log.id"
+              :class="{
+                'border-green-500': log.current_status === 'accepted',
+                'border-blue-500': log.current_status === 'returned',
+                'border-gray-300':
+                  log.current_status !== 'accepted' && log.current_status !== 'returned',
+              }"
+              class="p-2 bg-white rounded-md shadow-md border-2"
+            >
+              <p>
+                <strong>Book:</strong> {{ log.book_title }}
+                <br />
+                <strong>Borrowed By:</strong> {{ log.user_name }}
+                <br />
+                <strong>Date Borrowed:</strong> {{ log.date_borrowed }}
+                <br />
+                <strong>Current Status:</strong> {{ log.current_status }}
+                <br />
+                <strong>Copy ID:</strong> {{ log.id }}
+                <br />
+                <strong>Return Date:</strong> {{ log.return_date || "N/A" }}
+                <br />
+              </p>
+            </li>
+          </ul>
+          <p v-if="logs.length === 0" class="text-gray-500">No borrow logs found.</p>
         </div>
       </main>
     </div>

@@ -28,13 +28,17 @@ Route::middleware(['auth', 'setDB'])->group(function () {
     })->name('dashboard');
     Route::get('/user-dashboard', [UserController::class, 'display_info'])->name('user-dashboard');
     Route::get('/user-dashboard/search', [UserController::class, 'search'])->name('user.search');
-
-
+    Route::post('/user-dashboard', [UserController::class, 'borrowBook'])->name('user.borrowBook');
+    Route::get('/user-dashboard/logs', [UserController::class, 'borrowLogs'])->name('user-dashboard.logs');
 
 
     Route::middleware(['librarian'])->group(function () {
         Route::get('/librarian-dashboard', [LibrarianController::class, 'display_info'])->name('librarian-dashboard');
         Route::get('/librarian-dashboard/search', [LibrarianController::class, 'search'])->name('librarian.search');
+        Route::post('/librarian-dashboard/insert', [LibrarianController::class, 'insertBorrowedBook'])->name('librarian-dashboard.insert');
+        Route::patch('/librarian-dashboard/update/{borrowedBook}', [LibrarianController::class, 'updateStatus'])->name('librarian-dashboard.update');
+        Route::put('/librarian-dashboard/update/{id}', [LibrarianController::class, 'updateBook'])->name('librarian.update');
+        Route::post('/librarian-dashboard/destroy/{id}', [LibrarianController::class, 'destroy'])->name('librarian.destroy');
     });
 
 
