@@ -14,17 +14,6 @@ class SetDBConnection
         // Default connection
         $connection = config('database.default');
 
-        $user = Auth::user();
-        DB::statement("SET myapp.user_id = " . (int) $user->user_id);
-
-        if ($user->role_id == 1) {
-            DB::statement("SET myapp.currentuser = 'viewer'");
-        } elseif ($user->role_id == 2) {
-            DB::statement("SET myapp.currentuser = 'editor'");
-        } elseif ($user->role_id == 3) {
-            DB::statement("SET myapp.currentuser = 'admin'");
-        }
-
         if (Auth::check()) {
             $user = Auth::user();
 
@@ -43,13 +32,6 @@ class SetDBConnection
         DB::reconnect($connection);
 
         DB::statement("SET myapp.user_id = " . (int) $user->user_id);
-        if ($user->role_id == 1) {
-            DB::statement("SET myapp.currentuser = 'viewer'");
-        } elseif ($user->role_id == 2) {
-            DB::statement("SET myapp.currentuser = 'editor'");
-        } elseif ($user->role_id == 3) {
-            DB::statement("SET myapp.currentuser = 'admin'");
-        }
 
         return $next($request);
     }

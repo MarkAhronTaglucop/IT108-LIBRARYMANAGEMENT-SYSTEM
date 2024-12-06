@@ -46,12 +46,10 @@ const debouncedSearch = debounce(async (newQuery) => {
 // Watch for changes in searchQuery
 watch(searchQuery, (newQuery, oldQuery) => {
   if (!newQuery.trim()) {
-    // If input is cleared, reset immediately
     filteredBooks.value = Array.isArray(props.books) ? [...props.books] : [];
-    router.get(route("user-dashboard"), {}, { preserveState: true }); 
+    router.get(route("user-dashboard"), {}, { preserveState: true });
   } else if (oldQuery.length === 1 && newQuery.length === 0) {
-    // Handle fast deletion to prevent "t" from persisting
-    debouncedSearch.cancel(); // Cancel any pending debounce calls
+    debouncedSearch.cancel();
     filteredBooks.value = Array.isArray(props.books) ? [...props.books] : [];
     router.get(route("user-dashboard"), {}, { preserveState: true });
   } else {
@@ -73,10 +71,37 @@ watch(
   { immediate: true }
 );
 
-// Borrow logs
-const borrowLogs = ref([]);
-const borrowBook = (book) => {
-  borrowLogs.value.push(`Borrowed: ${book.title} by: ${book.author_name}`);
+// Borrow book method
+const isBorrowing = ref(false);
+
+const borrowBook = async (userId, bookId) => {
+  // Ask the user for confirmation before proceeding
+  const isConfirmed = confirm("Are you sure you want to borrow this book?");
+
+  if (!isConfirmed) {
+    return; // Stop the function if the user cancels
+  }
+
+  try {
+    isBorrowing.value = true; // Set isBorrowing to true to indicate loading
+
+    // Make the API call to borrow the book
+    await router.post(
+      route("user.borrowBook"),
+      { users_id: userId, book_id: bookId },
+      { preserveState: true }
+    );
+
+    alert("Book borrowed successfully!");
+
+    // Optionally refresh the page or update the state
+    router.get(route("user-dashboard"), {}, { preserveState: true });
+  } catch (error) {
+    console.error(error);
+    alert("Failed to borrow the book. Please try again.");
+  } finally {
+    isBorrowing.value = true;
+  }
 };
 </script>
 
@@ -157,7 +182,8 @@ const borrowBook = (book) => {
                 </p>
               </div>
               <button
-                @click="borrowBook(book)"
+                @click="borrowBook($page.props.auth.user.id, book.id)"
+                :disabled="isBorrowing"
                 class="px-4 py-2 bg-black text-white rounded hover:bg-neutral-700 transition"
               >
                 Borrow
@@ -175,13 +201,13 @@ const borrowBook = (book) => {
         >
           <h3 class="text-xl font-semibold text-gray-800">Borrow Logs</h3>
           <ul class="mt-4 space-y-2">
-            <li
+            <!-- <li
               v-for="(log, index) in borrowLogs"
               :key="index"
               class="p-2 bg-white rounded-md shadow-md"
             >
               {{ log }}
-            </li>
+            </li> -->
           </ul>
         </div>
       </main>

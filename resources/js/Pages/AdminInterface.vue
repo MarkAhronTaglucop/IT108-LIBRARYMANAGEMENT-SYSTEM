@@ -58,7 +58,7 @@ const deleteUser = (userId) => {
 // Function to show the Edit User modal
 // Open the modal and populate the form for editing
 const editUser = (user) => {
-    if (getRole(user.role_id) === "admin") {
+  if (getRole(user.role_id) === "admin") {
     alert("Admin roles cannot be edited or demoted.");
     return;
   }
@@ -117,7 +117,6 @@ const closeModal = () => {
   editingUser.value = null;
   userForm.value = { id: null, name: "", email: "", role_id: "" };
 };
-
 </script>
 
 <template>
@@ -205,7 +204,7 @@ const closeModal = () => {
                   </td>
                   <td class="px-4 lg:px-6 py-3 whitespace-nowrap space-x-3">
                     <button
-                    v-if="getRole(userviews.role_id) !== 'admin'"
+                      v-if="getRole(userviews.role_id) !== 'admin'"
                       @click="editUser(userviews)"
                       class="text-indigo-600 hover:text-indigo-900"
                     >
