@@ -92,9 +92,7 @@ const submitUser = () => {
       },
       {
         onSuccess: () => {
-          const userIndex = users.value.findIndex(
-            (u) => u.id === userForm.value.id
-          );
+          const userIndex = users.value.findIndex((u) => u.id === userForm.value.id);
           if (userIndex > -1) {
             users.value[userIndex].role_id = userForm.value.role_id;
           }
@@ -251,9 +249,7 @@ const closeModal = () => {
         </h3>
         <form @submit.prevent="submitUser" class="space-y-4">
           <div>
-            <label for="name" class="block text-sm font-medium text-gray-700"
-              >Name</label
-            >
+            <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
             <input
               type="text"
               id="name"
@@ -275,20 +271,14 @@ const closeModal = () => {
             />
           </div>
           <div>
-            <label for="role" class="block text-sm font-medium text-gray-700"
-              >Role</label
-            >
+            <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
             <select
               id="role"
               v-model="userForm.role_id"
               required
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring-indigo-200"
             >
-              <option
-                v-for="role in props.roles"
-                :key="role.id"
-                :value="role.id"
-              >
+              <option v-for="role in props.roles" :key="role.id" :value="role.id">
                 {{ role.user_type }}
               </option>
             </select>
@@ -313,3 +303,30 @@ const closeModal = () => {
     </div>
   </AuthenticatedLayout>
 </template>
+
+<style scoped>
+/* Webkit Browsers */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px; /* for horizontal scrollbars */
+}
+
+.textsy textarea {
+  resize: none;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 50px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 50px; /* Circular border */
+  border: 3px solid #f1f1f1; /* Adds space around thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+</style>

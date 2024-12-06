@@ -14,11 +14,15 @@ class LibrarianController extends Controller
         $users = User::with('role')->get();
         $roles = DB::table('roles')->get();
         $books = DB::select('SELECT * FROM view_books');
+        $borrowLogs = DB::select('SELECT * FROM view_borrowed_books');
+        $AcceptingLogs = DB::select('SELECT * FROM view_borrowed_books_status_1');
 
         return Inertia::render('LibrarianInterface', [
             'users' => $users,
             'roles' => $roles,
-            'books' => $books
+            'books' => $books,
+            'borrowLogs' => $borrowLogs, // Include borrowLogs
+            'AcceptingLogs' => $AcceptingLogs, // Include borrowLogs
         ]);
     }
 
@@ -46,7 +50,36 @@ class LibrarianController extends Controller
         ]);
     }
 
-    public function updateBook(Request $request, $id)
+    
+    public function updateStatus(Request $request, $borrowedId)
+{
+    $borrowedBook = DB::table('borrowed_books')->where('id', $borrowedId)->first();
+
+    if (!$borrowedBook) {
+        return redirect()->back()->with('error', 'Borrowed book record not found.');
+    }
+
+    // Validate the input
+    $validated = $request->validate([
+        'new_status_id' => 'required|in:2,3', // 2 for accepted, 3 for returned
+    ]);
+
+    // Prevent updating status if it is already returned
+    if ($borrowedBook->status_id == 3) {
+        return redirect()->back()->with('error', 'This book has already been returned.');
+    }
+
+    // Update the status using the PostgreSQL function
+    try {
+        DB::statement('SELECT update_borrowed_book_status(?, ?)', [$borrowedBook->id, $validated['new_status_id']]);
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Failed to update book status: ' . $e->getMessage());
+    }
+
+    return redirect()->route('librarian-dashboard')->with('success', 'Book status updated successfully!');
+}
+
+public function updateBook(Request $request, $id)
     {
         try {
             // Validate the incoming request data
@@ -86,6 +119,8 @@ class LibrarianController extends Controller
             return redirect()->back()->with('error', 'Failed to delete book: ' . $e->getMessage());
         }
     }
+    
+
 
     public function store(Request $request)
 {
@@ -120,5 +155,6 @@ class LibrarianController extends Controller
         return redirect()->back()->with('error', 'Failed to add the book: ' . $e->getMessage());
     }
 }
+
 
 }
