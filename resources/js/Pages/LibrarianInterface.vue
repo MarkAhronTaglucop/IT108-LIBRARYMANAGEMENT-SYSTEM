@@ -88,15 +88,16 @@ function deleteBook(id) {
   if (confirm("Are you sure you want to delete this book?")) {
     router.post(route("librarian.destroy", { id }), {
       onSuccess: () => {
-        window.location.reload();
         console.log("Book deleted successfully!");
       },
       onError: (errors) => {
         console.error("Failed to delete book:", errors);
       },
     });
+    window.location.reload();
   }
 }
+
 // Add, edit, and delete functionalities remain untouched
 const showEditBookModal = ref(false);
 const bookData = ref({
@@ -108,9 +109,6 @@ const bookData = ref({
   number_of_copies: 0,
 });
 
-// Regex pattern for validation
-const regexPattern = /^[a-zA-Z0-9\s.,!?&'-]+$/;
-
 // Open modal and populate form fields
 const editBook = (book) => {
   bookData.value = { ...book };
@@ -119,46 +117,17 @@ const editBook = (book) => {
 
 // Save changes to the book
 const saveBook = async () => {
-  // Validate fields
-  if (!regexPattern.test(bookData.value.title)) {
-    alert("Invalid title. Please use only allowed characters.");
-    return;
-  }
-
-  if (!regexPattern.test(bookData.value.category)) {
-    alert("Invalid category. Please use only allowed characters.");
-    return;
-  }
-
-  if (!regexPattern.test(bookData.value.genre)) {
-    alert("Invalid genre. Please use only allowed characters.");
-    return;
-  }
-
-  if (!bookData.value.year_published.match(/^\d{4}-\d{2}-\d{2}$/)) {
-    alert("Invalid publication year. Please use the format YYYY-MM-DD.");
-    return;
-  }
-
-  if (
-    !Number.isInteger(bookData.value.number_of_copies) ||
-    bookData.value.number_of_copies < 0
-  ) {
-    alert("Invalid number of copies. Please enter a positive integer.");
-    return;
-  }
-
   try {
     await router.put(`/librarian-dashboard/update/${bookData.value.id}`, {
       title: bookData.value.title,
       category: bookData.value.category,
       genre: bookData.value.genre,
       year_published: bookData.value.year_published,
-      number_of_copies: bookData.value.number_of_copies,
+      number_of_copies: bookData.value.num_copies, // Fixed key
     });
 
-    window.location.reload();
     alert("Book updated successfully!");
+    window.location.reload();
   } catch (error) {
     console.error("Failed to update book:", error);
     alert("An error occurred while updating the book.");
@@ -194,6 +163,38 @@ const updateStatus = async (borrowedId, newStatusId) => {
     }
   } catch (error) {
     console.error("Error updating status:", error);
+  }
+};
+
+const showAddBookModal = ref(false);
+const newBookData = ref({
+  title: "",
+  category: "",
+  genre: "",
+  year_published: "",
+  author_name: "",
+  author_country: "",
+});
+
+const addBook = async () => {
+  try {
+    console.log("New Book Data:", newBookData.value);
+    await router.put(`/librarian-dashboard/add `, {
+      title: newBookData.value.title,
+      category: newBookData.value.category,
+      genre: newBookData.value.genre,
+      year_published: newBookData.value.year_published,
+      author_name: newBookData.value.author_name,
+      author_country: newBookData.value.author_country,
+    });
+
+    alert("Book added successfully!");
+    window.location.reload();
+  } catch (error) {
+    console.error("Failed to add book:", error);
+    alert("An error occurred while adding the book.");
+  } finally {
+    showAddBookModal.value = false;
   }
 };
 </script>
@@ -256,9 +257,100 @@ const updateStatus = async (borrowedId, newStatusId) => {
             <PlusIcon class="w-5 h-5 mr-2" />
             Add Book
           </button>
+          <!-- Add Book Modal -->
+          <div
+            v-if="showAddBookModal"
+            class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center"
+          >
+            <div class="bg-white p-6 rounded-lg shadow-lg w-96 h-[90vh] overflow-y-auto">
+              <h3 class="text-xl font-bold mb-4">Add New Book</h3>
+
+              <!-- Book Information Form -->
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Book Title:</label>
+                <input
+                  v-model="newBookData.title"
+                  type="text"
+                  class="mt-1 p-2 w-full border rounded"
+                  placeholder="Enter book title"
+                />
+              </div>
+
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Category:</label>
+                <input
+                  v-model="newBookData.category"
+                  type="text"
+                  class="mt-1 p-2 w-full border rounded"
+                  placeholder="Enter book category"
+                />
+              </div>
+
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Genre:</label>
+                <input
+                  v-model="newBookData.genre"
+                  type="text"
+                  class="mt-1 p-2 w-full border rounded"
+                  placeholder="Enter book genre"
+                />
+              </div>
+
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700"
+                  >Year Published:</label
+                >
+                <input
+                  v-model="newBookData.year_published"
+                  type="date"
+                  class="mt-1 p-2 w-full border rounded"
+                />
+              </div>
+
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700"
+                  >Author Name:</label
+                >
+                <input
+                  v-model="newBookData.author_name"
+                  type="text"
+                  class="mt-1 p-2 w-full border rounded"
+                  placeholder="Enter Author Name"
+                />
+              </div>
+
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700"
+                  >Author Country:</label
+                >
+                <input
+                  v-model="newBookData.author_country"
+                  type="text"
+                  class="mt-1 p-2 w-full border rounded"
+                  placeholder="Enter Author Country"
+                />
+              </div>
+
+              <!-- Modal Buttons -->
+              <div class="flex justify-end">
+                <button
+                  @click="addBook"
+                  class="px-4 py-2 bg-black text-white rounded hover:bg-neutral-700 transition mr-2"
+                >
+                  Add Book
+                </button>
+                <button
+                  @click="showAddBookModal = false"
+                  class="px-4 py-2 bg-white text-black rounded hover:bg-gray-300 transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- Modal for Adding or Editing Book -->
+        <!-- Modal for Editing Book -->
         <div
           v-if="showEditBookModal"
           class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center"
@@ -270,7 +362,6 @@ const updateStatus = async (borrowedId, newStatusId) => {
             <div class="mb-4">
               <label class="block text-sm font-medium text-gray-700">Book Title: </label>
               <input
-                @input="validateInput('title', bookData.title)"
                 v-model="bookData.title"
                 type="text"
                 class="mt-1 p-2 w-full border rounded"
@@ -281,7 +372,6 @@ const updateStatus = async (borrowedId, newStatusId) => {
             <div class="mb-4">
               <label class="block text-sm font-medium text-gray-700">Category:</label>
               <input
-                @input="validateInput('category', bookData.category)"
                 v-model="bookData.category"
                 type="text"
                 class="mt-1 p-2 w-full border rounded"
@@ -291,7 +381,6 @@ const updateStatus = async (borrowedId, newStatusId) => {
             <div class="mb-4">
               <label class="block text-sm font-medium text-gray-700">Genre:</label>
               <input
-                @input="validateInput('category', bookData.genre)"
                 v-model="bookData.genre"
                 type="text"
                 class="mt-1 p-2 w-full border rounded"
@@ -314,7 +403,6 @@ const updateStatus = async (borrowedId, newStatusId) => {
             <div class="mb-4">
               <label class="block text-sm font-medium text-gray-700">Copies:</label>
               <input
-                @input="validateInput('category', bookData.num_copies)"
                 v-model="bookData.num_copies"
                 type="number"
                 class="mt-1 p-2 w-full border rounded"
@@ -413,7 +501,7 @@ const updateStatus = async (borrowedId, newStatusId) => {
                 <button
                   @click="updateStatus(log.borrowed_id, 2)"
                   :disabled="log.current_status === 'accepted'"
-                  class="px-3 py-1 text-sm font-medium text-white bg-green-500 rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="px-3 py-1 text-sm font-medium text-white bg-green-500 rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-green-500"
                 >
                   Accept
                 </button>
@@ -421,7 +509,7 @@ const updateStatus = async (borrowedId, newStatusId) => {
                 <button
                   @click="updateStatus(log.borrowed_id, 3)"
                   :disabled="log.current_status === 'pending'"
-                  class="px-3 py-1 text-sm font-medium text-white bg-blue-500 rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="px-3 py-1 text-sm font-medium text-white bg-blue-500 rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-500"
                 >
                   Returned
                 </button>
@@ -473,3 +561,30 @@ const updateStatus = async (borrowedId, newStatusId) => {
     </div>
   </AuthenticatedLayout>
 </template>
+
+<style scoped>
+/* Webkit Browsers */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px; /* for horizontal scrollbars */
+}
+
+.textsy textarea {
+  resize: none;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 50px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 50px; /* Circular border */
+  border: 3px solid #f1f1f1; /* Adds space around thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+</style>
