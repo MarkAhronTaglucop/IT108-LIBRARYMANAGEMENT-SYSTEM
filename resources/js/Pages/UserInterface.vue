@@ -15,6 +15,30 @@ const props = defineProps({
   borrowLogs: Array, // Add this
   filteredBooks: Array,
 });
+// Reactive states
+const searchQuery = ref("");
+const filteredBooks = ref(props.filteredBooks || []);
+const users = ref(props.users || []);
+const cachedRoles = ref(props.roles || []);
+const books = ref(props.books || []);
+// Initialize filteredBooks safely
+// Reactive states
+const borrowLogs = ref(props.borrowLogs || []);
+
+const getRole = (roleId) => {
+  // Ensure cachedRoles is an array
+  if (!Array.isArray(cachedRoles.value)) {
+    console.error("cachedRoles is not iterable:", cachedRoles.value);
+    return "Unknown";
+  }
+  const role = cachedRoles.value.find((role) => role.id === roleId);
+  return role ? role.user_type : "Unknown";
+};
+
+// User profile state
+const user = ref({
+  avatar: "/images/image.png",
+});
 
 const borrowBook = async (book) => {
   try {
@@ -65,32 +89,6 @@ const borrowBook = async (book) => {
   }
 };
 
-// Reactive states
-const searchQuery = ref("");
-const filteredBooks = ref(props.filteredBooks || []);
-const users = ref(props.users || []);
-const cachedRoles = ref(props.roles || []);
-const books = ref(props.books || []);
-// Initialize filteredBooks safely
-// Reactive states
-const borrowLogs = ref(props.borrowLogs || []);
-
-const getRole = (roleId) => {
-  // Ensure cachedRoles is an array
-  if (!Array.isArray(cachedRoles.value)) {
-    console.error("cachedRoles is not iterable:", cachedRoles.value);
-    return "Unknown";
-  }
-
-  // Find the role by roleId
-  const role = cachedRoles.value.find((role) => role.id === roleId);
-  return role ? role.user_type : "Unknown";
-};
-
-// User profile state
-const user = ref({
-  avatar: "/images/image.png",
-});
 
 // Debounced search function
 const debouncedSearch = debounce(async (newQuery) => {

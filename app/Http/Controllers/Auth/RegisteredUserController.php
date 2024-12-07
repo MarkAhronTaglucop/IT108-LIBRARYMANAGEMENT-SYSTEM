@@ -51,7 +51,7 @@ class RegisteredUserController extends Controller
             ],
         ]);
 
-        $defaultRoleId = 1;
+        $defaultRoleId = 3;
 
         $user = User::create([
             'name' => $request->name,
