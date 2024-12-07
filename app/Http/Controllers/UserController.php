@@ -50,7 +50,7 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return Inertia::render('UserInterface', [
                 'searchedbooks' => [],
-                'error' => $e->getMessage()
+                'error' => $e->getMessage() // Optional: Include error for debugging
             ]);
         }
 
