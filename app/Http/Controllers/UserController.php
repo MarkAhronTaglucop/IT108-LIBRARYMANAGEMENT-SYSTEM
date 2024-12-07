@@ -117,12 +117,6 @@ class UserController extends Controller
                 ]);
             }
 
-            // Log the general error and display a generic message
-            \Log::error('SQL Exception in borrowBook: ' . $errorMessage, [
-                'users_id' => $usersId,
-                'book_id' => $bookId,
-            ]);
-
             return redirect()->route('user-dashboard')->with([
                 'success' => false,
                 'message' => 'An error occurred while borrowing the book. Please try again.',
@@ -131,11 +125,6 @@ class UserController extends Controller
             // Handle general exceptions (e.g., unexpected errors)
             $errorMessage = $e->getMessage();
 
-            // Log the exception message
-            \Log::error('Exception in borrowBook: ' . $errorMessage, [
-                'users_id' => $usersId,
-                'book_id' => $bookId,
-            ]);
 
             return redirect()->route('user-dashboard')->with([
                 'success' => false,

@@ -179,7 +179,7 @@ const newBookData = ref({
 const addBook = async () => {
   try {
     console.log("New Book Data:", newBookData.value);
-    await router.put(`/librarian-dashboard/add `, {
+    await router.put("librarian.add", {
       title: newBookData.value.title,
       category: newBookData.value.category,
       genre: newBookData.value.genre,

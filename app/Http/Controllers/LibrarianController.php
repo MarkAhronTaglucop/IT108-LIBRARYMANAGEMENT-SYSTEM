@@ -125,8 +125,7 @@ public function updateBook(Request $request, $id)
     public function store(Request $request)
 {
     try {
-        // Validate the incoming request data
-        $request->validate([
+          $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'required|string|max:50',
             'genre' => 'required|string|max:50',
@@ -135,7 +134,6 @@ public function updateBook(Request $request, $id)
             'author_country' => 'required|string|max:50',
         ]);
 
-        // Execute the SQL function
         $result = DB::select('SELECT add_book_with_author_and_copy(?, ?, ?, ?, ?, ?)', [
             $request->input('title'),
             $request->input('category'),
@@ -143,15 +141,9 @@ public function updateBook(Request $request, $id)
             $request->input('year_published'),
             $request->input('author_name'),
             $request->input('author_country'),
-        ]);
-
-        // Retrieve the message from the function's response
-        
-
-        // Return success response
+        ]);        
         return back()->with('success', 'Book updated successfully.');
     } catch (\Exception $e) {
-        // Handle errors (consider logging the exception)
         return redirect()->back()->with('error', 'Failed to add the book: ' . $e->getMessage());
     }
 }
