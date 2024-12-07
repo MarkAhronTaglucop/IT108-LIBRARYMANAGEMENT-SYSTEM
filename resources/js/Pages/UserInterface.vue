@@ -47,45 +47,40 @@ const borrowBook = async (book) => {
       (log) => log.users_id === props.auth.user.id && log.book_id === book.id
     );
 
-    hasBorrowed === !confirmBorrow;
-    hasBorrowed === alert(`You already borrowed: ${book.title}`);
+    // If the user has borrowed the book, show an alert and exit
+    if (hasBorrowed) {
+      alert(`You have already borrowed: ${book.title}`);
+      return;
+    }
 
-    // Ask for user confirmation before borrowing
+    // Ask for user confirmation before borrowing the book
     const confirmBorrow = confirm(`Do you want to borrow this book: ${book.title}?`);
     if (!confirmBorrow) {
       return; // Exit if the user cancels
     }
 
-    if (!hasBorrowed) {
-      // Assume success if no errors occurred
-      borrowLogs.value.push(
-        `Successfully borrowed: ${book.title} by ${book.author_name}`
-      );
-      alert(`You successfully borrowed: ${book.title}`);
-
-      // Refresh the page
-      window.location.reload();
-      return; // Exit early if the book is already borrowed
-    }
-
-    // Attempt to borrow the book
-    const response = await router.post(route("user-dashboard"), {
+    // Proceed with borrowing the book
+    const response = await router.post(route("user.borrowBook"), {
       users_id: props.auth.user.id,
       book_id: book.id,
     });
+
+    // Update borrowLogs and show success message
+    alert(`You successfully borrowed: ${book.title}`);
+    window.location.reload();
+
+    // Optionally, you can update the book list or any other state here without reloading the page
+    // Example: If the book is successfully borrowed, you can remove it from the list or mark it
+    // filteredBooks.value = filteredBooks.value.filter(b => b.id !== book.id); 
+
   } catch (error) {
     console.error(error);
 
-    // Check if the error message is about already borrowing the book
-    if (error.response?.data?.message === "You have already borrowed this book.") {
-      alert("You have already borrowed this book.");
-    } else {
-      // Default error handling
-      const errorMessage =
-        error.response?.data?.message || `Failed to borrow: ${book.title}`;
-      borrowLogs.value.push(errorMessage);
-      alert(errorMessage);
-    }
+    // Handle known errors, e.g., already borrowed or no available copies
+    const errorMessage =
+      error.response?.data?.message || `Failed to borrow: ${book.title}`;
+    borrowLogs.value.push(errorMessage);
+    alert(errorMessage);
   }
 };
 
@@ -104,7 +99,6 @@ const debouncedSearch = debounce(async (newQuery) => {
 // Watch for changes in searchQuery
 watch(searchQuery, (newQuery, oldQuery) => {
   if (!newQuery.trim()) {
-    // If input is cleared, reset immediately
     filteredBooks.value = Array.isArray(props.books) ? [...props.books] : [];
     router.get(route("user-dashboard"), {}, { preserveState: true });
   } else if (oldQuery.length === 1 && newQuery.length === 0) {
@@ -198,7 +192,7 @@ onMounted(() => {
           <h3 class="text-xl font-semibold text-gray-800">Search Results</h3>
           <ul class="mt-4 space-y-2">
             <li
-              v-for="book in books.filter((book) => book.num_copies > 1)"
+              v-for="book in filteredBooks"
               :key="book.id"
               class="p-4 bg-white rounded-md shadow-md flex justify-between items-center"
             >

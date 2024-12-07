@@ -19,7 +19,7 @@ class UserController extends Controller
         $books = DB::select('SELECT * FROM view_books');
         $users = User::all(); // Example for users
         $roles = DB::table('roles')->get(); // Example for roles
-    
+
         $user = $request->user()->load('role'); // Ensure role is loaded
         return Inertia::render('UserInterface', [
             'auth' => [
@@ -31,9 +31,8 @@ class UserController extends Controller
             'users' => $users,
             'roles' => $roles, // If you need to pass all roles
         ]);
-
     }
-    
+
 
     public function search(Request $request)
     {
@@ -61,55 +60,87 @@ class UserController extends Controller
 
     public function borrowBook(Request $request)
     {
+        // Step 1: Validate the incoming request
         $request->validate([
             'users_id' => 'required|integer',
             'book_id' => 'required|integer',
         ]);
-    
+
         $usersId = $request->input('users_id');
         $bookId = $request->input('book_id');
-    
+
+        // Step 2: Check if the book and user exist in the database
+        $bookExists = DB::table('books')->where('id', $bookId)->exists();
+        $userExists = DB::table('users')->where('id', $usersId)->exists();
+
+        if (!$bookExists) {
+            return redirect()->route('user-dashboard')->with([
+                'success' => false,
+                'message' => 'The specified book does not exist.',
+            ]);
+        }
+
+        if (!$userExists) {
+            return redirect()->route('user-dashboard')->with([
+                'success' => false,
+                'message' => 'The specified user does not exist.',
+            ]);
+        }
+
+        // Step 3: Attempt to execute the SQL function to borrow the book
         try {
             // Call the database function to borrow the book
             DB::statement('SELECT insert_borrowed_book(?, ?)', [$usersId, $bookId]);
-    
-            // Redirect with a success message
+
+            // Step 4: Redirect with a success message
             return redirect()->route('user-dashboard')->with([
                 'success' => true,
                 'message' => 'The book has been successfully borrowed.',
             ]);
         } catch (\Illuminate\Database\QueryException $qe) {
-            // Handle SQL-related errors, including the case when the user has already borrowed the book
+            // Handle known SQL-related errors
             $errorMessage = $qe->getMessage();
-    
-            // Check if the error message indicates that the user has already borrowed the book
-            if (strpos($errorMessage, 'You have already borrowed this book.') !== false) {
-                // Flash the error message to the session
+
+            // Handle case when the user has already borrowed the book
+            if (strpos($errorMessage, 'User has already borrowed this book') !== false) {
                 return redirect()->route('user-dashboard')->with([
                     'success' => false,
                     'message' => 'You have already borrowed this book.',
                 ]);
             }
-    
-            // Log the error message
-            // \Log::error('SQL Exception in borrowBook: ' . $errorMessage);
-    
-            // Flash a general error message
+
+            // Handle case when no copies are available
+            if (strpos($errorMessage, 'No available copies') !== false) {
+                return redirect()->route('user-dashboard')->with([
+                    'success' => false,
+                    'message' => 'Sorry, there are no available copies of this book.',
+                ]);
+            }
+
+            // Log the general error and display a generic message
+            \Log::error('SQL Exception in borrowBook: ' . $errorMessage, [
+                'users_id' => $usersId,
+                'book_id' => $bookId,
+            ]);
+
             return redirect()->route('user-dashboard')->with([
                 'success' => false,
                 'message' => 'An error occurred while borrowing the book. Please try again.',
             ]);
         } catch (\Exception $e) {
-            // Handle general errors
+            // Handle general exceptions (e.g., unexpected errors)
             $errorMessage = $e->getMessage();
-            // \Log::error('Exception in borrowBook: ' . $errorMessage);
-    
-            // Flash the error message to the session
+
+            // Log the exception message
+            \Log::error('Exception in borrowBook: ' . $errorMessage, [
+                'users_id' => $usersId,
+                'book_id' => $bookId,
+            ]);
+
             return redirect()->route('user-dashboard')->with([
                 'success' => false,
-                'message' => $errorMessage,
+                'message' => 'An error occurred: ' . $errorMessage,
             ]);
         }
     }
-    
 }
