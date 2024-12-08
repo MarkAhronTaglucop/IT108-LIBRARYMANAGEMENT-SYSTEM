@@ -28,6 +28,31 @@ class LibrarianController extends Controller
         ]);
     }
 
+    //A search query to find a book a users looking for
+    public function search(Request $request)
+    {
+        $searchQuery = $request->input('searchQuery', '');
+
+        if (empty($searchQuery)) {
+            return Inertia::render('LibrarianInterface', [
+                'searchedbooks' => []
+            ]);
+        }
+
+        try {
+            $searchedbooks = DB::select('SELECT * FROM SearchBooksByTitle(?)', [$searchQuery]);
+        } catch (\Exception $e) {
+            return Inertia::render('LibrarianInterface', [
+                'searchedbooks' => [],
+                'error' => $e->getMessage()
+            ]);
+        }
+
+        return Inertia::render('LibrarianInterface', [
+            'searchedbooks' => $searchedbooks
+        ]);
+    }
+
     //To add a new book in the DB with a new  copy
     public function addBook(Request $request)
     {
@@ -56,30 +81,7 @@ class LibrarianController extends Controller
     }
 
 
-    //A search query to find a book a users looking for
-    public function search(Request $request)
-    {
-        $searchQuery = $request->input('searchQuery', '');
 
-        if (empty($searchQuery)) {
-            return Inertia::render('LibrarianInterface', [
-                'searchedbooks' => []
-            ]);
-        }
-
-        try {
-            $searchedbooks = DB::select('SELECT * FROM SearchBooksByTitle(?)', [$searchQuery]);
-        } catch (\Exception $e) {
-            return Inertia::render('LibrarianInterface', [
-                'searchedbooks' => [],
-                'error' => $e->getMessage()
-            ]);
-        }
-
-        return Inertia::render('LibrarianInterface', [
-            'searchedbooks' => $searchedbooks
-        ]);
-    }
 
 
     //To update A book its information and copies and such

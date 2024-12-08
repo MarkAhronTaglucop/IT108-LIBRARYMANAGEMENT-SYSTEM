@@ -17,7 +17,6 @@ const props = defineProps({
 });
 
 // Reactive states
-
 const logs = ref([...props.borrowLogs]);
 const acceptlogs = ref([...props.AcceptingLogs]);
 const users = ref([...props.users]);
@@ -179,7 +178,7 @@ const newBookData = ref({
 const addBook = async () => {
   try {
     console.log("New Book Data:", newBookData.value);
-    await router.put("librarian.add", {
+    await router.post('/librarian-dashboard/add', {
       title: newBookData.value.title,
       category: newBookData.value.category,
       genre: newBookData.value.genre,
@@ -189,7 +188,7 @@ const addBook = async () => {
     });
 
     alert("Book added successfully!");
-    window.location.reload();
+    // window.location.reload();
   } catch (error) {
     console.error("Failed to add book:", error);
     alert("An error occurred while adding the book.");
@@ -198,6 +197,7 @@ const addBook = async () => {
   }
 };
 </script>
+
 
 <template>
   <Head title="Librarian Dashboard" />

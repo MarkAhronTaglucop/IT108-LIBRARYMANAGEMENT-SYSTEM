@@ -55,9 +55,7 @@ const borrowBook = async (book) => {
     }
 
     // Ask for user confirmation before borrowing the book
-    const confirmBorrow = confirm(
-      `Do you want to borrow this book: ${book.title}?`
-    );
+    const confirmBorrow = confirm(`Do you want to borrow this book: ${book.title}?`);
     if (!confirmBorrow) {
       return; // Exit if the user cancels
     }
@@ -179,9 +177,7 @@ onMounted(() => {
 
       <!-- Main Content -->
       <main class="w-full md:w-3/4 p-4 md:p-8">
-        <h1
-          class="text-2xl md:text-3xl font-bold mb-4 text-gray-800 flex items-center"
-        >
+        <h1 class="text-2xl md:text-3xl font-bold mb-4 text-gray-800 flex items-center">
           <LayoutDashboardIcon class="w-6 md:w-8 h-6 md:h-8 mr-2" />
           Dashboard
         </h1>
@@ -233,8 +229,7 @@ onMounted(() => {
                 'border-green-500': log.current_status === 'accepted',
                 'border-blue-500': log.current_status === 'returned',
                 'border-gray-300':
-                  log.current_status !== 'accepted' &&
-                  log.current_status !== 'returned',
+                  log.current_status !== 'accepted' && log.current_status !== 'returned',
               }"
               class="p-2 bg-white rounded-md shadow-md border-2"
             >
