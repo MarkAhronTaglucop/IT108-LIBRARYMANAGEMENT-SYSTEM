@@ -44,12 +44,10 @@ const user = ref({
 const borrowBook = async (book) => {
   try {
     // Check if the user has already borrowed the book
-    const hasBorrowed = props.borrowLogs.some(
-      (log) => log.users_id === props.auth.user.id && log.book_id === book.id
-    );
+    const borrowedBook = borrowLogs.value.find((log) => log.book_title === book.title);
 
-    // If the user has borrowed the book, show an alert and exit
-    if (hasBorrowed) {
+    if (borrowedBook) {
+      // If the user has already borrowed the book, show an alert and return
       alert(`You have already borrowed: ${book.title}`);
       return;
     }
@@ -61,22 +59,15 @@ const borrowBook = async (book) => {
     }
 
     // Proceed with borrowing the book
-    const response = await router.post(route("user.borrowBook"), {
+    await router.post("/user-dashboard/borrow-book", {
       users_id: props.auth.user.id,
       book_id: book.id,
     });
 
     // Update borrowLogs and show success message
     alert(`You successfully borrowed: ${book.title}`);
-    window.location.reload();
   } catch (error) {
     console.error(error);
-
-    // Handle known errors, e.g., already borrowed or no available copies
-    const errorMessage =
-      error.response?.data?.message || `Failed to borrow: ${book.title}`;
-    borrowLogs.value.push(errorMessage);
-    alert(errorMessage);
   }
 };
 
@@ -97,10 +88,9 @@ watch(searchQuery, (newQuery, oldQuery) => {
     filteredBooks.value = Array.isArray(props.books) ? [...props.books] : [];
     router.get(route("user-dashboard"), {}, { preserveState: true });
   } else if (oldQuery.length === 1 && newQuery.length === 0) {
-    // Handle fast deletion to prevent "t" from persisting
-    debouncedSearch.cancel(); // Cancel any pending debounce calls
+    debouncedSearch.cancel();
     filteredBooks.value = Array.isArray(props.books) ? [...props.books] : [];
-    router.get(route("user-dashboard"), {}, { preserveState: true });
+    router.get(route("luser-dashboard"), {}, { preserveState: true });
   } else {
     debouncedSearch(newQuery);
   }
@@ -119,7 +109,6 @@ watch(
   },
   { immediate: true }
 );
-
 // On Mounted Hooks
 onMounted(() => {
   console.log("Borrow Logs:", props.borrowLogs); // Inspect the data
@@ -197,8 +186,12 @@ onMounted(() => {
                 <p class="font-semibold">{{ book.title }}</p>
                 <p class="text-gray-500">{{ book.author_name }}</p>
                 <p class="text-gray-400">
-                  <strong>Category & Genre:</strong>
-                  {{ book.category }}, {{ book.genre }}
+                  <strong>Category:</strong>
+                  {{ book.category }}
+                </p>
+                <p class="text-gray-400">
+                  <strong>Genre:</strong>
+                  {{ book.genre }}
                 </p>
                 <p class="text-gray-400">
                   <strong>Year Published:</strong>

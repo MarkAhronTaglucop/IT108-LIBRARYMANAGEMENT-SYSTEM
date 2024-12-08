@@ -49,7 +49,7 @@ const debouncedSearch = debounce(async (newQuery) => {
   }
 }, 300);
 
-// Watch for changes in searchQuery
+// Watchers
 watch(searchQuery, (newQuery, oldQuery) => {
   if (!newQuery.trim()) {
     filteredBooks.value = Array.isArray(props.books) ? [...props.books] : [];
@@ -63,7 +63,6 @@ watch(searchQuery, (newQuery, oldQuery) => {
   }
 });
 
-// Watch for backend updates to searchedbooks
 watch(
   () => props.searchedbooks,
   (newBooks) => {
@@ -82,22 +81,18 @@ onMounted(() => {
   console.log("Accepting Logs:", props.AcceptingLogs);
 });
 
-// Method to delete a book
-function deleteBook(id) {
+// Methods
+const deleteBook = (id) => {
   if (confirm("Are you sure you want to delete this book?")) {
     router.post(route("librarian.destroy", { id }), {
-      onSuccess: () => {
-        console.log("Book deleted successfully!");
-      },
-      onError: (errors) => {
-        console.error("Failed to delete book:", errors);
-      },
+      onSuccess: () => console.log("Book deleted successfully!"),
+      onError: (errors) => console.error("Failed to delete book:", errors),
     });
     window.location.reload();
   }
-}
+};
 
-// Add, edit, and delete functionalities remain untouched
+// Book management
 const showEditBookModal = ref(false);
 const bookData = ref({
   id: null,
@@ -108,13 +103,11 @@ const bookData = ref({
   number_of_copies: 0,
 });
 
-// Open modal and populate form fields
 const editBook = (book) => {
   bookData.value = { ...book };
   showEditBookModal.value = true;
 };
 
-// Save changes to the book
 const saveBook = async () => {
   try {
     await router.put(`/librarian-dashboard/update/${bookData.value.id}`, {
@@ -124,42 +117,28 @@ const saveBook = async () => {
       year_published: bookData.value.year_published,
       number_of_copies: bookData.value.num_copies, // Fixed key
     });
-
     alert("Book updated successfully!");
-    window.location.reload();
   } catch (error) {
     console.error("Failed to update book:", error);
     alert("An error occurred while updating the book.");
   } finally {
-    showEditBookModal.value = false; // Ensure modal closes
+    showEditBookModal.value = false;
   }
 };
 
 const updateStatus = async (borrowedId, newStatusId) => {
   console.log("Updating status for:", borrowedId, "with status:", newStatusId);
-
   try {
     await router.patch(
       route("librarian-dashboard.update", borrowedId),
       { new_status_id: newStatusId },
       {
         preserveScroll: true,
-        onSuccess: () => {
-          console.log("Book status updated successfully!");
-        },
-        onError: (errors) => {
-          console.error("Validation errors:", errors);
-        },
+        onSuccess: () => console.log("Book status updated successfully!"),
+        onError: (errors) => console.error("Validation errors:", errors),
       }
     );
-
-    // Update local logs to reflect the change
-    const logIndex = logs.value.findIndex((log) => log.id === borrowedId); // Use borrowedId for matching
-    // Refresh the page
-    window.location.reload();
-    if (logIndex !== -1) {
-      logs.value[logIndex].status_id = newStatusId;
-    }
+    // window.location.reload();
   } catch (error) {
     console.error("Error updating status:", error);
   }
@@ -178,7 +157,7 @@ const newBookData = ref({
 const addBook = async () => {
   try {
     console.log("New Book Data:", newBookData.value);
-    await router.post('/librarian-dashboard/add', {
+    await router.post("/librarian-dashboard/add", {
       title: newBookData.value.title,
       category: newBookData.value.category,
       genre: newBookData.value.genre,
@@ -186,9 +165,7 @@ const addBook = async () => {
       author_name: newBookData.value.author_name,
       author_country: newBookData.value.author_country,
     });
-
     alert("Book added successfully!");
-    // window.location.reload();
   } catch (error) {
     console.error("Failed to add book:", error);
     alert("An error occurred while adding the book.");
@@ -197,6 +174,7 @@ const addBook = async () => {
   }
 };
 </script>
+
 
 
 <template>
@@ -264,12 +242,16 @@ const addBook = async () => {
             v-if="showAddBookModal"
             class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center"
           >
-            <div class="bg-white p-6 rounded-lg shadow-lg w-96 h-[90vh] overflow-y-auto">
+            <div
+              class="bg-white p-6 rounded-lg shadow-lg w-96 h-[90vh] overflow-y-auto"
+            >
               <h3 class="text-xl font-bold mb-4">Add New Book</h3>
 
               <!-- Book Information Form -->
               <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700">Book Title:</label>
+                <label class="block text-sm font-medium text-gray-700"
+                  >Book Title:</label
+                >
                 <input
                   v-model="newBookData.title"
                   type="text"
@@ -279,7 +261,9 @@ const addBook = async () => {
               </div>
 
               <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700">Category:</label>
+                <label class="block text-sm font-medium text-gray-700"
+                  >Category:</label
+                >
                 <input
                   v-model="newBookData.category"
                   type="text"
@@ -289,7 +273,9 @@ const addBook = async () => {
               </div>
 
               <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700">Genre:</label>
+                <label class="block text-sm font-medium text-gray-700"
+                  >Genre:</label
+                >
                 <input
                   v-model="newBookData.genre"
                   type="text"
@@ -362,7 +348,9 @@ const addBook = async () => {
 
             <!-- Book Informations -->
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Book Title: </label>
+              <label class="block text-sm font-medium text-gray-700"
+                >Book Title:
+              </label>
               <input
                 v-model="bookData.title"
                 type="text"
@@ -372,7 +360,9 @@ const addBook = async () => {
             </div>
 
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Category:</label>
+              <label class="block text-sm font-medium text-gray-700"
+                >Category:</label
+              >
               <input
                 v-model="bookData.category"
                 type="text"
@@ -381,7 +371,9 @@ const addBook = async () => {
               />
             </div>
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Genre:</label>
+              <label class="block text-sm font-medium text-gray-700"
+                >Genre:</label
+              >
               <input
                 v-model="bookData.genre"
                 type="text"
@@ -403,7 +395,9 @@ const addBook = async () => {
             </div>
 
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Copies:</label>
+              <label class="block text-sm font-medium text-gray-700"
+                >Copies:</label
+              >
               <input
                 v-model="bookData.num_copies"
                 type="number"
@@ -495,9 +489,11 @@ const addBook = async () => {
                   <strong>Book:</strong> {{ log.book_title }}<br />
                   <strong>Borrowed By:</strong> {{ log.user_name }}<br />
                   <strong>Date Borrowed:</strong> {{ log.date_borrowed }}<br />
-                  <strong>Current Status:</strong> {{ log.current_status }}<br />
+                  <strong>Current Status:</strong> {{ log.current_status
+                  }}<br />
                   <strong>Copy ID:</strong> {{ log.id }}<br />
-                  <strong>Return Date:</strong> {{ log.return_date || "N/A" }}<br />
+                  <strong>Return Date:</strong> {{ log.return_date || "N/A"
+                  }}<br />
                 </p>
               </div>
               <div class="flex gap-2">
@@ -547,7 +543,8 @@ const addBook = async () => {
                 'border-red-500': log.current_status === 'denied',
                 'border-blue-500': log.current_status === 'returned',
                 'border-gray-300':
-                  log.current_status !== 'accepted' && log.current_status !== 'returned',
+                  log.current_status !== 'accepted' &&
+                  log.current_status !== 'returned',
               }"
               class="p-2 bg-white rounded-md shadow-md border-2"
             >
@@ -567,7 +564,9 @@ const addBook = async () => {
               </p>
             </li>
           </ul>
-          <p v-if="logs.length === 0" class="text-gray-500">No borrow logs found.</p>
+          <p v-if="logs.length === 0" class="text-gray-500">
+            No borrow logs found.
+          </p>
         </div>
       </main>
     </div>

@@ -74,7 +74,7 @@ class LibrarianController extends Controller
                 $request->input('author_name'),
                 $request->input('author_country'),
             ]);
-            return back()->with('success', 'Book updated successfully.');
+            return redirect()->route('librarian-dashboard')->with('success', 'Book updated successfully.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to add the book: ' . $e->getMessage());
         }
@@ -105,9 +105,9 @@ class LibrarianController extends Controller
                 $request->input('number_of_copies'),
             ]);
 
-            return back()->with('success', 'Book updated successfully.');
+            return redirect()->route('librarian-dashboard')->with('success', 'Book updated successfully.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Failed to update the book: ' . $e->getMessage());
+            return back()->route('librarian-dashboard')->with('error', 'Failed to update the book: ' . $e->getMessage());
         }
     }
 
@@ -130,7 +130,7 @@ class LibrarianController extends Controller
         $borrowedBook = DB::table('borrowed_books')->where('id', $borrowedId)->first();
 
         if (!$borrowedBook) {
-            return redirect()->back()->with('error', 'Borrowed book record not found.');
+            return redirect()->route('library')->with('error', 'Borrowed book record not found.');
         }
 
         $validated = $request->validate([

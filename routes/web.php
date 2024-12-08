@@ -28,7 +28,7 @@ Route::middleware(['auth', 'setDB'])->group(function () {
     })->name('dashboard');
     Route::get('/user-dashboard', [UserController::class, 'display_info'])->name('user-dashboard');
     Route::get('/user-dashboard/search', [UserController::class, 'search'])->name('user.search');
-    Route::post('/user-dashboard', [UserController::class, 'borrowBook'])->name('user.borrowBook');
+    Route::post('/user-dashboard/borrow-book', [UserController::class, 'borrowBook'])->name('user.borrowBook');
     Route::get('/user-dashboard/logs', [UserController::class, 'borrowLogs'])->name('user-dashboard.logs');
 
 

@@ -1,84 +1,24 @@
 <script setup>
-import GuestLayout from '@/Layouts/GuestLayout.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import GuestLayout from "@/Layouts/GuestLayout.vue";
+import InputError from "@/Components/InputError.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import TextInput from "@/Components/TextInput.vue";
+import { Head, Link, useForm } from "@inertiajs/vue3";
+import { Mail, User, Lock } from "lucide-vue-next";
 
-// Utility function to sanitize input
-const sanitizeInput = (value) => value.replace(/<[^>]*>?/gm, '');
-
-// Define form and validation rules
 const form = useForm({
-    name: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
+    name: "",
+    email: "",
+    password: "",
+    password_confirmation: "",
 });
 
-const rules = {
-    required: (v) => !!v || 'This field is required.',
-    fullname: (v) =>
-        (v && v.length >= 10 && v.length <= 50) || 'Name must be 10-50 characters long.',
-    email: (v) =>
-        /^(?:[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/.test(v) ||
-        'E-mail must be valid.',
-    password: (v) =>
-        (v &&
-            v.length >= 8 &&
-            /[A-Z]/.test(v) &&
-            /[a-z]/.test(v) &&
-            /[0-9]/.test(v) &&
-            /[!@#$%^&*(),.?":{}|<>]/.test(v)) ||
-        'Password must be at least 8 characters, including uppercase, lowercase, number, and special character.',
-};
-
-// Form submission logic
 const submit = () => {
-    const errors = {};
-
-    // Name validation
-    if (!form.name || form.name.length < 10) {
-        errors.name = "Name should be at least 10 characters long";
-    }
-
-    // Email validation
-    if (!form.email || !/.+@.+\..+/.test(form.email)) {
-        errors.email = "E-mail must be valid";
-    }
-
-    // Password validation
-    if (
-        !form.password ||
-        form.password.length < 8 ||
-        !/[A-Z]/.test(form.password) ||
-        !/[a-z]/.test(form.password) ||
-        !/[0-9]/.test(form.password) ||
-        !/[!@#$%^&*(),.?":{}|<>]/.test(form.password)
-    ) {
-        errors.password =
-            "Password must be at least 8 characters and contain uppercase, lowercase, number, and special character";
-    }
-
-    // Password confirmation validation
-    if (form.password !== form.password_confirmation) {
-        errors.password_confirmation = "Password confirmation does not match";
-    }
-
-    form.errors = errors;
-
-    // Stop submission if there are any errors
-    if (Object.keys(errors).length > 0) {
-        return;
-    }
-
-    // Submit the form if validation passes
-    form.post(route('register'), {
-        onFinish: () => form.reset('password', 'password_confirmation'),
+    form.post(route("register"), {
+        onFinish: () => form.reset("password", "password_confirmation"),
     });
 };
-
 </script>
 
 <template>
@@ -86,61 +26,92 @@ const submit = () => {
         <Head title="Register" />
 
         <form @submit.prevent="submit">
+            <h1 class="text-center text-3xl font-bold">
+                Welcome To The Library
+            </h1>
+            <h4 class="text-1xl pt-6 pb-2">Please fill up the following:</h4>
+
             <div>
                 <InputLabel for="name" value="Name" />
-                <TextInput
-                    id="name"
-                    type="text"
-                    class="mt-1 block w-full"
-                    v-model="form.name"
-                    maxlength="50"
-                    required
-                    autofocus
-                    autocomplete="name"
-                />
+                <div class="relative">
+                    <TextInput
+                        id="name"
+                        type="text"
+                        class="mt-1 block w-full pl-10"
+                        v-model="form.name"
+                        maxlength="50"
+                        required
+                        autofocus
+                        autocomplete="name"
+                    />
+                    <User
+                        class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    />
+                </div>
                 <InputError class="mt-2" :message="form.errors.name" />
             </div>
 
             <div class="mt-4">
                 <InputLabel for="email" value="Email" />
-                <TextInput
-                    id="email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    v-model="form.email"
-                    maxlength="100"
-                    required
-                    autocomplete="username"
-                />
+                <div class="relative">
+                    <TextInput
+                        id="email"
+                        type="email"
+                        class="mt-1 block w-full pl-10"
+                        v-model="form.email"
+                        maxlength="100"
+                        required
+                        autocomplete="username"
+                    />
+                    <Mail
+                        class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    />
+                </div>
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
             <div class="mt-4">
                 <InputLabel for="password" value="Password" />
-                <TextInput
-                    id="password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password"
-                    maxlength="50"
-                    required
-                    autocomplete="new-password"
-                />
+                <div class="relative">
+                    <TextInput
+                        id="password"
+                        type="password"
+                        class="mt-1 block w-full pl-10"
+                        v-model="form.password"
+                        maxlength="50"
+                        required
+                        autocomplete="new-password"
+                    />
+                    <Lock
+                        class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    />
+                </div>
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
 
             <div class="mt-4">
-                <InputLabel for="password_confirmation" value="Confirm Password" />
-                <TextInput
-                    id="password_confirmation"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password_confirmation"
-                    maxlength="50"
-                    required
-                    autocomplete="new-password"
+                <InputLabel
+                    for="password_confirmation"
+                    value="Confirm Password"
                 />
-                <InputError class="mt-2" :message="form.errors.password_confirmation" />
+                <div class="relative">
+                    <TextInput
+                        id="password_confirmation"
+                        type="password"
+                        class="mt-1 block w-full pl-10"
+                        v-model="form.password_confirmation"
+                        maxlength="50"
+                        required
+                        autocomplete="new-password"
+                    />
+                    <Lock
+                        class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    />
+                </div>
+                <InputError
+                    class="mt-2"
+                    :message="form.errors.password_confirmation"
+                />
             </div>
 
             <div class="mt-4 flex items-center justify-end">
