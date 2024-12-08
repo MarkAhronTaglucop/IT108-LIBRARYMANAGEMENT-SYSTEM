@@ -151,7 +151,7 @@ onMounted(() => {
       <h2
         class="text-xl font-semibold leading-tight text-gray-800 flex items-center justify-between"
       >
-        <span>Library Management</span>
+        <span>Library Management oten</span>
         <input
           v-model="searchQuery"
           type="text"
