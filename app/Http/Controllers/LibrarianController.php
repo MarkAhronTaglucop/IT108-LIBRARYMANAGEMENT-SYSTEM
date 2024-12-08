@@ -9,6 +9,8 @@ use Inertia\Inertia;
 
 class LibrarianController extends Controller
 {
+
+    //To diplay all or render information
     public function display_info()
     {
         $users = User::with('role')->get();
@@ -21,11 +23,40 @@ class LibrarianController extends Controller
             'users' => $users,
             'roles' => $roles,
             'books' => $books,
-            'borrowLogs' => $borrowLogs, // Include borrowLogs
-            'AcceptingLogs' => $AcceptingLogs, // Include borrowLogs
+            'borrowLogs' => $borrowLogs,
+            'AcceptingLogs' => $AcceptingLogs,
         ]);
     }
 
+    //To add a new book in the DB with a new  copy
+    public function addBook(Request $request)
+    {
+        try {
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'category' => 'required|string|max:50',
+                'genre' => 'required|string|max:50',
+                'year_published' => 'required|date|before_or_equal:today',
+                'author_name' => 'required|string|max:255',
+                'author_country' => 'required|string|max:50',
+            ]);
+
+            $result = DB::select('SELECT add_book_with_author_and_copy(?, ?, ?, ?, ?, ?)', [
+                $request->input('title'),
+                $request->input('category'),
+                $request->input('genre'),
+                $request->input('year_published'),
+                $request->input('author_name'),
+                $request->input('author_country'),
+            ]);
+            return back()->with('success', 'Book updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to add the book: ' . $e->getMessage());
+        }
+    }
+
+
+    //A search query to find a book a users looking for
     public function search(Request $request)
     {
         $searchQuery = $request->input('searchQuery', '');
@@ -50,39 +81,11 @@ class LibrarianController extends Controller
         ]);
     }
 
-    
-    public function updateStatus(Request $request, $borrowedId)
-{
-    $borrowedBook = DB::table('borrowed_books')->where('id', $borrowedId)->first();
 
-    if (!$borrowedBook) {
-        return redirect()->back()->with('error', 'Borrowed book record not found.');
-    }
-
-    // Validate the input
-    $validated = $request->validate([
-        'new_status_id' => 'required|in:2,3', // 2 for accepted, 3 for returned
-    ]);
-
-    // Prevent updating status if it is already returned
-    if ($borrowedBook->status_id == 3) {
-        return redirect()->back()->with('error', 'This book has already been returned.');
-    }
-
-    // Update the status using the PostgreSQL function
-    try {
-        DB::statement('SELECT update_borrowed_book_status(?, ?)', [$borrowedBook->id, $validated['new_status_id']]);
-    } catch (\Exception $e) {
-        return redirect()->back()->with('error', 'Failed to update book status: ' . $e->getMessage());
-    }
-
-    return redirect()->route('librarian-dashboard')->with('success', 'Book status updated successfully!');
-}
-
-public function updateBook(Request $request, $id)
+    //To update A book its information and copies and such
+    public function updateBook(Request $request, $id)
     {
         try {
-            // Validate the incoming request data
             $request->validate([
                 'title' => 'required|string|max:255',
                 'category' => 'required|string|max:50',
@@ -91,7 +94,6 @@ public function updateBook(Request $request, $id)
                 'number_of_copies' => 'required|integer|min:1',
             ]);
 
-            // Execute the SQL function
             DB::statement('SELECT update_book_and_copies(?, ?, ?, ?, ?, ?)', [
                 $id,
                 $request->input('title'),
@@ -101,52 +103,48 @@ public function updateBook(Request $request, $id)
                 $request->input('number_of_copies'),
             ]);
 
-            // Return success response
             return back()->with('success', 'Book updated successfully.');
         } catch (\Exception $e) {
-            // Handle errors
             return back()->with('error', 'Failed to update the book: ' . $e->getMessage());
         }
     }
 
-    public function destroy($id)
+
+    //To Delete a book
+    public function deleteBook($id)
     {
         try {
-            DB::statement('SELECT delete_book_and_unused_authors(?)', [$id]);   
+            DB::statement('SELECT delete_book_and_unused_authors(?)', [$id]);
 
             return redirect()->route('librarian-dashboard')->with('success', 'Book and related records deleted successfully.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to delete book: ' . $e->getMessage());
         }
     }
-    
 
+    //To update the status of a book whether its accepted or not
+    public function updateStatus(Request $request, $borrowedId)
+    {
+        $borrowedBook = DB::table('borrowed_books')->where('id', $borrowedId)->first();
 
-    public function store(Request $request)
-{
-    try {
-          $request->validate([
-            'title' => 'required|string|max:255',
-            'category' => 'required|string|max:50',
-            'genre' => 'required|string|max:50',
-            'year_published' => 'required|date|before_or_equal:today',
-            'author_name' => 'required|string|max:255',
-            'author_country' => 'required|string|max:50',
+        if (!$borrowedBook) {
+            return redirect()->back()->with('error', 'Borrowed book record not found.');
+        }
+
+        $validated = $request->validate([
+            'new_status_id' => 'required|in:2,3',
         ]);
 
-        $result = DB::select('SELECT add_book_with_author_and_copy(?, ?, ?, ?, ?, ?)', [
-            $request->input('title'),
-            $request->input('category'),
-            $request->input('genre'),
-            $request->input('year_published'),
-            $request->input('author_name'),
-            $request->input('author_country'),
-        ]);        
-        return back()->with('success', 'Book updated successfully.');
-    } catch (\Exception $e) {
-        return redirect()->back()->with('error', 'Failed to add the book: ' . $e->getMessage());
+        if ($borrowedBook->status_id == 3) {
+            return redirect()->back()->with('error', 'This book has already been returned.');
+        }
+
+        try {
+            DB::statement('SELECT update_borrowed_book_status(?, ?)', [$borrowedBook->id, $validated['new_status_id']]);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update book status: ' . $e->getMessage());
+        }
+
+        return redirect()->route('librarian-dashboard')->with('success', 'Book status updated successfully!');
     }
-}
-
-
 }

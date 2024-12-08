@@ -15,16 +15,16 @@ const props = defineProps({
   borrowLogs: Array, // Add this
   filteredBooks: Array,
 });
+
 // Reactive states
 const searchQuery = ref("");
 const filteredBooks = ref(props.filteredBooks || []);
 const users = ref(props.users || []);
 const cachedRoles = ref(props.roles || []);
 const books = ref(props.books || []);
-// Initialize filteredBooks safely
-// Reactive states
 const borrowLogs = ref(props.borrowLogs || []);
 
+// Get Role function
 const getRole = (roleId) => {
   // Ensure cachedRoles is an array
   if (!Array.isArray(cachedRoles.value)) {
@@ -40,6 +40,7 @@ const user = ref({
   avatar: "/images/image.png",
 });
 
+// Borrow Book function
 const borrowBook = async (book) => {
   try {
     // Check if the user has already borrowed the book
@@ -54,7 +55,9 @@ const borrowBook = async (book) => {
     }
 
     // Ask for user confirmation before borrowing the book
-    const confirmBorrow = confirm(`Do you want to borrow this book: ${book.title}?`);
+    const confirmBorrow = confirm(
+      `Do you want to borrow this book: ${book.title}?`
+    );
     if (!confirmBorrow) {
       return; // Exit if the user cancels
     }
@@ -68,11 +71,6 @@ const borrowBook = async (book) => {
     // Update borrowLogs and show success message
     alert(`You successfully borrowed: ${book.title}`);
     window.location.reload();
-
-    // Optionally, you can update the book list or any other state here without reloading the page
-    // Example: If the book is successfully borrowed, you can remove it from the list or mark it
-    // filteredBooks.value = filteredBooks.value.filter(b => b.id !== book.id); 
-
   } catch (error) {
     console.error(error);
 
@@ -83,7 +81,6 @@ const borrowBook = async (book) => {
     alert(errorMessage);
   }
 };
-
 
 // Debounced search function
 const debouncedSearch = debounce(async (newQuery) => {
@@ -125,6 +122,7 @@ watch(
   { immediate: true }
 );
 
+// On Mounted Hooks
 onMounted(() => {
   console.log("Borrow Logs:", props.borrowLogs); // Inspect the data
   borrowLogs.value = [...(props.borrowLogs || [])];
@@ -135,6 +133,7 @@ onMounted(() => {
   books.value = [...(props.books || [])];
 });
 </script>
+
 
 <template>
   <Head title="User Dashboard" />
@@ -180,7 +179,9 @@ onMounted(() => {
 
       <!-- Main Content -->
       <main class="w-full md:w-3/4 p-4 md:p-8">
-        <h1 class="text-2xl md:text-3xl font-bold mb-4 text-gray-800 flex items-center">
+        <h1
+          class="text-2xl md:text-3xl font-bold mb-4 text-gray-800 flex items-center"
+        >
           <LayoutDashboardIcon class="w-6 md:w-8 h-6 md:h-8 mr-2" />
           Dashboard
         </h1>
@@ -232,7 +233,8 @@ onMounted(() => {
                 'border-green-500': log.current_status === 'accepted',
                 'border-blue-500': log.current_status === 'returned',
                 'border-gray-300':
-                  log.current_status !== 'accepted' && log.current_status !== 'returned',
+                  log.current_status !== 'accepted' &&
+                  log.current_status !== 'returned',
               }"
               class="p-2 bg-white rounded-md shadow-md border-2"
             >

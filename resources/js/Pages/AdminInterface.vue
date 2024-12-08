@@ -17,22 +17,26 @@ import {
   EyeIcon,
 } from "lucide-vue-next";
 
-//props
+// Props
 const props = defineProps({
   users: Array,
   roles: Array,
 });
+
 // Reactive state for users
 const users = ref([...props.users]);
-//to get the role based on user id
+
+// To get the role based on user id
 const getRole = (roleId) => {
   const role = props.roles.find((role) => role.id === roleId);
   return role ? role.user_type : "Unknown";
 };
-//user-profile state
+
+// User profile state
 const user = ref({
   avatar: "/images/image.png",
 });
+
 // User Form for Editing Role
 const showAddUserModal = ref(false);
 const editingUser = ref(null);
@@ -41,12 +45,14 @@ const userForm = ref({
   email: "",
   role: "",
 });
+
 // Function to delete user
 const deleteUser = (userId) => {
   if (confirm("Are you sure you want to delete this user?")) {
     router.delete(route("admin.deleteUser", { user: userId }), {
       onSuccess: () => {
         users.value = users.value.filter((user) => user.id !== userId);
+         alert("User deleted successfully.");
       },
       onError: () => {
         alert("There was an error deleting the user.");
@@ -72,6 +78,7 @@ const editUser = (user) => {
     role_id: user.role_id,
   };
 };
+
 // Submit updated role to the backend
 const submitUser = () => {
   if (editingUser.value) {
@@ -92,7 +99,9 @@ const submitUser = () => {
       },
       {
         onSuccess: () => {
-          const userIndex = users.value.findIndex((u) => u.id === userForm.value.id);
+          const userIndex = users.value.findIndex(
+            (u) => u.id === userForm.value.id
+          );
           if (userIndex > -1) {
             users.value[userIndex].role_id = userForm.value.role_id;
           }
@@ -116,6 +125,7 @@ const closeModal = () => {
   userForm.value = { id: null, name: "", email: "", role_id: "" };
 };
 </script>
+
 
 <template>
   <Head title="Dashboard" />
@@ -249,7 +259,9 @@ const closeModal = () => {
         </h3>
         <form @submit.prevent="submitUser" class="space-y-4">
           <div>
-            <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+            <label for="name" class="block text-sm font-medium text-gray-700"
+              >Name</label
+            >
             <input
               type="text"
               id="name"
@@ -271,14 +283,20 @@ const closeModal = () => {
             />
           </div>
           <div>
-            <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
+            <label for="role" class="block text-sm font-medium text-gray-700"
+              >Role</label
+            >
             <select
               id="role"
               v-model="userForm.role_id"
               required
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring-indigo-200"
             >
-              <option v-for="role in props.roles" :key="role.id" :value="role.id">
+              <option
+                v-for="role in props.roles"
+                :key="role.id"
+                :value="role.id"
+              >
                 {{ role.user_type }}
               </option>
             </select>

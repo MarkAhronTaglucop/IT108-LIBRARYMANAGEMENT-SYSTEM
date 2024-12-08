@@ -37,8 +37,8 @@ Route::middleware(['auth', 'setDB'])->group(function () {
         Route::get('/librarian-dashboard/search', [LibrarianController::class, 'search'])->name('librarian.search');
         Route::patch('/librarian-dashboard/update/{borrowedBook}', [LibrarianController::class, 'updateStatus'])->name('librarian-dashboard.update');
         Route::put('/librarian-dashboard/update/{id}', [LibrarianController::class, 'updateBook'])->name('librarian.update');
-        Route::post('/librarian-dashboard/destroy/{id}', [LibrarianController::class, 'destroy'])->name('librarian.destroy');
-        Route::put('/librarian-dashboard/add', [LibrarianController::class, 'store'])->name('librarian.add');
+        Route::post('/librarian-dashboard/destroy/{id}', [LibrarianController::class, 'deleteBook'])->name('librarian.destroy');
+        Route::put('/librarian-dashboard/add', [LibrarianController::class, 'addBook'])->name('librarian.add');
     });
 
 
