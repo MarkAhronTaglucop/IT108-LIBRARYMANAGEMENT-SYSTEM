@@ -227,6 +227,7 @@ onMounted(() => {
               :key="index"
               :class="{
                 'border-green-500': log.current_status === 'accepted',
+                'border-red-500': log.current_status === 'denied',
                 'border-blue-500': log.current_status === 'returned',
                 'border-gray-300':
                   log.current_status !== 'accepted' && log.current_status !== 'returned',

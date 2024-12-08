@@ -503,6 +503,13 @@ const addBook = async () => {
               <div class="flex gap-2">
                 <!-- Accept button -->
                 <button
+                  @click="updateStatus(log.borrowed_id, 4)"
+                  :disabled="log.current_status === 'Denied'"
+                  class="px-3 py-1 text-sm font-medium text-white bg-red-500 rounded hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-green-500"
+                >
+                  Deny
+                </button>
+                <button
                   @click="updateStatus(log.borrowed_id, 2)"
                   :disabled="log.current_status === 'accepted'"
                   class="px-3 py-1 text-sm font-medium text-white bg-green-500 rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-green-500"
@@ -537,6 +544,7 @@ const addBook = async () => {
               :key="log.id"
               :class="{
                 'border-green-500': log.current_status === 'accepted',
+                'border-red-500': log.current_status === 'denied',
                 'border-blue-500': log.current_status === 'returned',
                 'border-gray-300':
                   log.current_status !== 'accepted' && log.current_status !== 'returned',

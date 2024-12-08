@@ -134,7 +134,7 @@ class LibrarianController extends Controller
         }
 
         $validated = $request->validate([
-            'new_status_id' => 'required|in:2,3',
+            'new_status_id' => 'required|in:2,3,4',
         ]);
 
         if ($borrowedBook->status_id == 3) {
