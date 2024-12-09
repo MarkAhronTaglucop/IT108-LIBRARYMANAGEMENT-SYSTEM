@@ -448,7 +448,7 @@ const addBook = async () => {
                   </p>
                   <!-- Display year published -->
                   <p class="text-gray-500">
-                    <strong>Number of copies:</strong> {{ book.num_copies }}
+                    <strong>Available copies:</strong> {{ book.num_copies }}
                   </p>
                 </div>
                 <div class="flex space-x-2">
@@ -500,7 +500,7 @@ const addBook = async () => {
                 <!-- Accept button -->
                 <button
                   @click="updateStatus(log.borrowed_id, 4)"
-                  :disabled="log.current_status === 'Denied'"
+                  :disabled="log.current_status === 'accepted'"
                   class="px-3 py-1 text-sm font-medium text-white bg-red-500 rounded hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-green-500"
                 >
                   Deny

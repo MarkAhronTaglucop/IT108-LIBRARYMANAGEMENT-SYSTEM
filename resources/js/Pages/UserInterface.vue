@@ -44,7 +44,7 @@ const user = ref({
 const borrowBook = async (book) => {
   try {
     // Check if the user has already borrowed the book
-    const borrowedBook = borrowLogs.value.find((log) => log.book_title === book.title);
+    const borrowedBook = borrowLogs.value.find((log) => log.current_status === 'pending');
 
     if (borrowedBook) {
       // If the user has already borrowed the book, show an alert and return
