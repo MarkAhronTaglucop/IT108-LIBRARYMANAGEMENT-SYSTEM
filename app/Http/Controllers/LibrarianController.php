@@ -16,6 +16,7 @@ class LibrarianController extends Controller
         $users = User::with('role')->get();
         $roles = DB::table('roles')->get();
         $books = DB::select('SELECT * FROM view_books');
+        $summary = DB::table('library_summary')->first();
         $borrowLogs = DB::select('SELECT * FROM view_borrowed_books');
         $AcceptingLogs = DB::select('SELECT * FROM view_borrowed_books_status_1');
 
@@ -23,6 +24,7 @@ class LibrarianController extends Controller
             'users' => $users,
             'roles' => $roles,
             'books' => $books,
+            'summary' => $summary,
             'borrowLogs' => $borrowLogs,
             'AcceptingLogs' => $AcceptingLogs,
         ]);

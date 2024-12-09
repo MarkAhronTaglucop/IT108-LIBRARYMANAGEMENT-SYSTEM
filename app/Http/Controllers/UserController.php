@@ -16,6 +16,7 @@ class UserController extends Controller
         $userId = $request->user()->id;
         $borrowLogs = DB::select('SELECT * FROM get_borrowed_books_by_user(?)', [$userId]);
         $books = DB::select('SELECT * FROM view_books');
+        $summary = DB::table('library_summary')->first();
         $users = User::all();
         $roles = DB::table('roles')->get();
 
@@ -29,6 +30,7 @@ class UserController extends Controller
             'books' => $books,
             'users' => $users,
             'roles' => $roles,
+            'summary' => $summary,
         ]);
     }
 

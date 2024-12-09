@@ -17,10 +17,13 @@ import {
 import BookCard from "@/Components/BookCard.vue";
 import { ref } from "vue";
 
-// Simulated dynamic data
-const totalBooks = ref(150);
-const borrowedBooks = ref(45);
-const activeUsers = ref(78);
+const props = defineProps({ 
+  summary: {
+    type: Object,
+    required: true,
+  },
+});
+
 const notifications = ref([
     {
         id: 1,
@@ -95,7 +98,7 @@ const recentActivities = ref([
                                 Total Books
                             </h3>
                             <p class="text-2xl font-bold text-gray-900">
-                                {{ totalBooks }}
+                                {{ summary.total_books }}
                             </p>
                         </div>
                     </div>
@@ -110,7 +113,7 @@ const recentActivities = ref([
                                 Books Borrowed
                             </h3>
                             <p class="text-2xl font-bold text-gray-900">
-                                {{ borrowedBooks }}
+                                {{ summary.total_borrowed_books }}
                             </p>
                         </div>
                     </div>
@@ -125,7 +128,7 @@ const recentActivities = ref([
                                 Active Users
                             </h3>
                             <p class="text-2xl font-bold text-gray-900">
-                                {{ activeUsers }}
+                                {{ summary.total_users_role_1 }}
                             </p>
                         </div>
                     </div>

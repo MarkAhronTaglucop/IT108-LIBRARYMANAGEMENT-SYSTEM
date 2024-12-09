@@ -14,7 +14,12 @@ class AdminController extends Controller
     {
         $users = User::with('role')->get();
         $roles = DB::table('roles')->get();
-        return Inertia::render('AdminInterface', ['users' => $users, 'roles' => $roles]);
+        $summary = DB::table('library_summary')->first();
+        return Inertia::render('AdminInterface', [
+            'users' => $users, 
+            'roles' => $roles,
+            'summary' => $summary,
+        ]);
     }
 
     public function updateUserRole(Request $request, $userId)

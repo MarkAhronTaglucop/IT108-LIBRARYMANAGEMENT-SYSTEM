@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LibrarianController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -26,6 +27,8 @@ Route::middleware(['auth', 'setDB'])->group(function () {
             'Dashboard'
         );
     })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'librarySummary'])->name('dashboard');
+
     Route::get('/user-dashboard', [UserController::class, 'display_info'])->name('user-dashboard');
     Route::get('/user-dashboard/search', [UserController::class, 'search'])->name('user.search');
     Route::post('/user-dashboard/borrow-book', [UserController::class, 'borrowBook'])->name('user.borrowBook');
