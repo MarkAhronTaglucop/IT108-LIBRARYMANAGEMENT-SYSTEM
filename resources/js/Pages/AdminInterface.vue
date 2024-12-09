@@ -124,16 +124,15 @@ const closeModal = () => {
     <Head title="Dashboard" />
 
     <AuthenticatedLayout>
-      <header class="bg-[#E5E1DA] shadow p-4 lg:p-6 border-b border-black">
+        <header class="bg-[#E5E1DA] shadow p-4 lg:p-6 border-b border-black">
             <div class="flex justify-between items-center">
                 <h2
                     class="text-xl font-semibold leading-tight text-gray-800 flex items-center"
                 >
                     <!-- Book Icon from Lucide -->
-                    <LucideBookIcon class="w-5 h-5 mr-2 text-gray-800" />
-                    <span>Library Management</span>
+                    <LucideBookIcon class="w-15 h-15 mr-2 text-gray-800" />
+                    <span :class="dynamicClass">Library Management</span>
                 </h2>
-                
             </div>
         </header>
 
@@ -163,7 +162,7 @@ const closeModal = () => {
             </aside>
 
             <!-- Main Content -->
-            <main class="w-full lg:w-3/4 p-4 lg:p-8 bg-[#F1F0E8]">
+            <main class="w-full lg:w-3/4 p-4 lg:p-8 bg-[#F1F0E8] min-h-100">
                 <h1
                     class="text-xl lg:text-3xl font-bold mb-4 lg:mb-6 text-gray-800 flex items-center"
                 >
@@ -201,7 +200,7 @@ const closeModal = () => {
 
                 <!-- User Management -->
                 <div
-                    class="bg-white shadow-md rounded-lg max-h-80 overflow-y-auto"
+                    class="bg-white shadow-md rounded-lg min-h-80 max-h-80 overflow-y-auto"
                 >
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">

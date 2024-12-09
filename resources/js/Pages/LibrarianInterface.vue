@@ -231,10 +231,10 @@ const addBook = async () => {
                     class="text-xl font-semibold leading-tight text-gray-800 flex items-center"
                 >
                     <!-- Book Icon from Lucide -->
-                    <LucideBookIcon class="w-5 h-5 mr-2 text-gray-800" />
+                    <LucideBookIcon class="w-15 h-15 mr-2 text-gray-800" />
                     <span>Library Management</span>
                 </h2>
-                <div class="relative">
+                <div class="relative w-full sm:w-auto">
                     <!-- Search Icon using Lucide -->
                     <LucideSearchIcon
                         class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500"
@@ -243,7 +243,7 @@ const addBook = async () => {
                         v-model="searchQuery"
                         type="text"
                         placeholder="Search books..."
-                        class="px-4 py-2 pl-10 w-64 border rounded-md text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 ml-auto"
+                        class="px-4 py-2 pl-10 w-full sm:w-64 border rounded-md text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 ml-auto"
                     />
                 </div>
             </div>
@@ -539,165 +539,177 @@ const addBook = async () => {
                 </div>
 
                 <!-- Search Results Display -->
-                <div
-                    class="bg-gray-100 p-4 md:p-6 rounded-lg shadow-md border border-black mb-6 max-h-64 overflow-y-auto"
-                >
-                    <h3 class="text-xl font-semibold text-gray-800">
-                        Search Results
-                    </h3>
-                    <ul class="mt-4 space-y-2">
-                        <li
-                            v-for="book in filteredBooks"
-                            :key="book.id"
-                            class="p-4 bg-white rounded-md shadow-md"
-                        >
-                            <div class="flex justify-between">
-                                <div>
-                                    <p class="font-semibold">
-                                        {{ book.title }}
-                                    </p>
-                                    <p class="text-gray-500">
-                                        {{ book.author_name }}
-                                    </p>
-                                    <p class="text-gray-500">
-                                        <strong>Category:</strong>
-                                        {{ book.category }}
-                                    </p>
-                                    <!-- Display category -->
-                                    <p class="text-gray-500">
-                                        <strong>Year Published:</strong>
-                                        {{ book.year_published }}
-                                    </p>
-                                    <!-- Display year published -->
-                                    <p class="text-gray-500">
-                                        <strong>Number of copies:</strong>
-                                        {{ book.num_copies }}
-                                    </p>
+                <div class="flex flex-col md:flex-row gap-4">
+                    <!-- Search Box Column -->
+                    <div
+                        class="bg-gray-100 p-4 md:p-6 rounded-lg shadow-md border border-black mb-6 w-full md:w-1/3 max-h-[95vh] overflow-y-auto"
+                    >
+                        <h3 class="text-xl font-semibold text-gray-800">
+                            Search Results
+                        </h3>
+                        <ul class="mt-4 space-y-2">
+                            <li
+                                v-for="book in filteredBooks"
+                                :key="book.id"
+                                class="p-4 bg-white rounded-md shadow-md"
+                            >
+                                <div class="flex justify-between">
+                                    <div>
+                                        <p class="font-semibold">
+                                            {{ book.title }}
+                                        </p>
+                                        <p class="text-gray-500">
+                                            {{ book.author_name }}
+                                        </p>
+                                        <p class="text-gray-500">
+                                            <strong>Category:</strong>
+                                            {{ book.category }}
+                                        </p>
+                                        <p class="text-gray-500">
+                                            <strong>Year Published:</strong>
+                                            {{ book.year_published }}
+                                        </p>
+                                        <p class="text-gray-500">
+                                            <strong>Number of copies:</strong>
+                                            {{ book.num_copies }}
+                                        </p>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <button
+                                            @click="editBook(book)"
+                                            class="text-sm text-blue-500 hover:underline"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            @click="deleteBook(book.id)"
+                                            class="text-sm text-red-500 hover:underline"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="flex space-x-2">
-                                    <button
-                                        @click="editBook(book)"
-                                        class="text-sm text-blue-500 hover:underline"
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        @click="deleteBook(book.id)"
-                                        class="text-sm text-red-500 hover:underline"
-                                    >
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                    <p v-if="filteredBooks.length === 0" class="text-gray-500">
-                        No books found.
-                    </p>
-                </div>
-
-                <div
-                    class="mt-8 w-full p-4 md:p-8 bg-gray-100 rounded-lg shadow-md border border-black h-64 overflow-y-auto max-h-64"
-                >
-                    <h4 class="text-lg font-semibold text-gray-700">
-                        Accepting Logs
-                    </h4>
-                    <ul class="mt-2 space-y-2">
-                        <li
-                            v-for="(log, index) in acceptlogs"
-                            :key="`accept-${index}` || log.borrowed_id"
-                            class="flex justify-between items-center p-2 bg-white rounded-md shadow-md"
+                            </li>
+                        </ul>
+                        <p
+                            v-if="filteredBooks.length === 0"
+                            class="text-gray-500"
                         >
-                            <div>
-                                <p>
-                                    <strong>Borrowed ID:</strong>
-                                    {{ log.borrowed_id }}<br />
-                                    <strong>Book:</strong> {{ log.book_title
-                                    }}<br />
-                                    <strong>Borrowed By:</strong>
-                                    {{ log.user_name }}<br />
-                                    <strong>Date Borrowed:</strong>
-                                    {{ log.date_borrowed }}<br />
-                                    <strong>Current Status:</strong>
-                                    {{ log.current_status }}<br />
-                                    <strong>Copy ID:</strong> {{ log.id }}<br />
-                                    <strong>Return Date:</strong>
-                                    {{ log.return_date || "N/A" }}<br />
-                                </p>
-                            </div>
-                            <div class="flex gap-2">
-                                <!-- Accept button -->
-                                <button
-                                    @click="updateStatus(log.borrowed_id, 2)"
-                                    :disabled="
-                                        log.current_status === 'accepted'
-                                    "
-                                    class="px-3 py-1 text-sm font-medium text-white bg-green-500 rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-green-500"
-                                >
-                                    Accept
-                                </button>
-                                <!-- Returned button -->
-                                <button
-                                    @click="updateStatus(log.borrowed_id, 3)"
-                                    :disabled="log.current_status === 'pending'"
-                                    class="px-3 py-1 text-sm font-medium text-white bg-blue-500 rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-500"
-                                >
-                                    Returned
-                                </button>
-                            </div>
-                        </li>
-                    </ul>
-                    <p v-if="acceptlogs.length === 0" class="text-gray-500">
-                        No book borrowing logs found.
-                    </p>
-                </div>
+                            No books found.
+                        </p>
+                    </div>
 
-                <!-- Borrowed Logs -->
-
-                <div
-                    class="mt-8 bg-gray-100 p-4 md:p-6 rounded-lg shadow-md border border-black h-64 max-h-64 overflow-y-auto"
-                >
-                    <h3 class="text-xl font-semibold text-gray-800">
-                        Borrow Logs
-                    </h3>
-                    <ul class="mt-4 space-y-2">
-                        <li
-                            v-for="log in logs"
-                            :key="log.id"
-                            :class="{
-                                'border-green-500':
-                                    log.current_status === 'accepted',
-                                'border-blue-500':
-                                    log.current_status === 'returned',
-                                'border-gray-300':
-                                    log.current_status !== 'accepted' &&
-                                    log.current_status !== 'returned',
-                            }"
-                            class="p-2 bg-white rounded-md shadow-md border-2"
+                    <!-- Logs Container Column -->
+                    <div class="flex flex-col gap-4 w-full md:w-2/3">
+                        <!-- Accepting Logs -->
+                        <div
+                            class="bg-gray-100 p-4 md:p-6 rounded-lg shadow-md border border-black max-h-[46vh] overflow-y-auto"
                         >
-                            <p>
-                                <strong>Book:</strong> {{ log.book_title }}
-                                <br />
-                                <strong>Borrowed By:</strong>
-                                {{ log.user_name }}
-                                <br />
-                                <strong>Date Borrowed:</strong>
-                                {{ log.date_borrowed }}
-                                <br />
-                                <strong>Current Status:</strong>
-                                {{ log.current_status }}
-                                <br />
-                                <strong>Copy ID:</strong> {{ log.id }}
-                                <br />
-                                <strong>Return Date:</strong>
-                                {{ log.return_date || "N/A" }}
-                                <br />
+                            <h4 class="text-lg font-semibold text-gray-700">
+                                Accepting Logs
+                            </h4>
+                            <ul class="mt-2 space-y-2">
+                                <li
+                                    v-for="(log, index) in acceptlogs"
+                                    :key="`accept-${index}` || log.borrowed_id"
+                                    class="flex justify-between items-center p-2 bg-white rounded-md shadow-md"
+                                >
+                                    <div>
+                                        <p>
+                                            <strong>Borrowed ID:</strong>
+                                            {{ log.borrowed_id }}<br />
+                                            <strong>Book:</strong>
+                                            {{ log.book_title }}<br />
+                                            <strong>Borrowed By:</strong>
+                                            {{ log.user_name }}<br />
+                                            <strong>Date Borrowed:</strong>
+                                            {{ log.date_borrowed }}<br />
+                                            <strong>Current Status:</strong>
+                                            {{ log.current_status }}<br />
+                                            <strong>Copy ID:</strong> {{ log.id
+                                            }}<br />
+                                            <strong>Return Date:</strong>
+                                            {{ log.return_date || "N/A" }}<br />
+                                        </p>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button
+                                            @click="
+                                                updateStatus(log.borrowed_id, 2)
+                                            "
+                                            :disabled="
+                                                log.current_status ===
+                                                'accepted'
+                                            "
+                                            class="px-3 py-1 text-sm font-medium text-white bg-green-500 rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-green-500"
+                                        >
+                                            Accept
+                                        </button>
+                                        <button
+                                            @click="
+                                                updateStatus(log.borrowed_id, 3)
+                                            "
+                                            :disabled="
+                                                log.current_status === 'pending'
+                                            "
+                                            class="px-3 py-1 text-sm font-medium text-white bg-blue-500 rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-500"
+                                        >
+                                            Returned
+                                        </button>
+                                    </div>
+                                </li>
+                            </ul>
+                            <p
+                                v-if="acceptlogs.length === 0"
+                                class="text-gray-500"
+                            >
+                                No book borrowing logs found.
                             </p>
-                        </li>
-                    </ul>
-                    <p v-if="logs.length === 0" class="text-gray-500">
-                        No borrow logs found.
-                    </p>
+                        </div>
+
+                        <!-- Borrowed Logs -->
+                        <div
+                            class="bg-gray-100 p-4 md:p-6 rounded-lg shadow-md border border-black max-h-[47vh] overflow-y-auto"
+                        >
+                            <h3 class="text-xl font-semibold text-gray-800">
+                                Borrow Logs
+                            </h3>
+                            <ul class="mt-4 space-y-2">
+                                <li
+                                    v-for="log in logs"
+                                    :key="log.id"
+                                    :class="{
+                                        'border-green-500':
+                                            log.current_status === 'accepted',
+                                        'border-blue-500':
+                                            log.current_status === 'returned',
+                                        'border-gray-300':
+                                            log.current_status !== 'accepted' &&
+                                            log.current_status !== 'returned',
+                                    }"
+                                    class="p-2 bg-white rounded-md shadow-md border-2"
+                                >
+                                    <p>
+                                        <strong>Book:</strong>
+                                        {{ log.book_title }}<br />
+                                        <strong>Borrowed By:</strong>
+                                        {{ log.user_name }}<br />
+                                        <strong>Date Borrowed:</strong>
+                                        {{ log.date_borrowed }}<br />
+                                        <strong>Current Status:</strong>
+                                        {{ log.current_status }}<br />
+                                        <strong>Copy ID:</strong> {{ log.id
+                                        }}<br />
+                                        <strong>Return Date:</strong>
+                                        {{ log.return_date || "N/A" }}<br />
+                                    </p>
+                                </li>
+                            </ul>
+                            <p v-if="logs.length === 0" class="text-gray-500">
+                                No borrow logs found.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </main>
         </div>

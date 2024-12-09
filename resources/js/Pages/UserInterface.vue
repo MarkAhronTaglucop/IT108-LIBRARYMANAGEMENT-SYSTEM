@@ -3,13 +3,20 @@ import { ref, computed, watch, onMounted } from "vue"; // Import onMounted
 import { Head, router } from "@inertiajs/vue3";
 import { debounce } from "lodash";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { LayoutDashboardIcon, EyeIcon, Search as LucideSearchIcon, Book as LucideBookIcon, BookOpen, BookMarked, Users } from "lucide-vue-next";
+import {
+    LayoutDashboardIcon,
+    EyeIcon,
+    Search as LucideSearchIcon,
+    Book as LucideBookIcon,
+    BookOpen,
+    BookMarked,
+    Users,
+} from "lucide-vue-next";
 
 //static rani siya for fetching
 const totalBooks = ref(150);
 const borrowedBooks = ref(45);
 const activeUsers = ref(78);
-
 
 // Props
 const props = defineProps({
@@ -130,34 +137,38 @@ onMounted(() => {
 <template>
     <Head title="User Dashboard" />
     <AuthenticatedLayout>
-      <header class="bg-[#E5E1DA] shadow p-4 lg:p-6 border-b border-black">
-    <div class="flex justify-between items-center">
-      <h2 class="text-xl font-semibold leading-tight text-gray-800 flex items-center">
-        <!-- Book Icon from Lucide -->
-        <LucideBookIcon class="w-5 h-5 mr-2 text-gray-800" />
-        <span>Library Management</span>
-      </h2>
-      <div class="relative">
-        <!-- Search Icon using Lucide -->
-        <LucideSearchIcon
-          class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500"
-        />
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="Search books..."
-          class="px-4 py-2 pl-10 w-64 border rounded-md text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 ml-auto"
-        />
-      </div>
-    </div>
-  </header>
+        <header class="bg-[#E5E1DA] shadow p-4 lg:p-6 border-b border-black">
+            <div class="flex justify-between items-center">
+                <h2
+                    class="text-xl font-semibold leading-tight text-gray-800 flex items-center"
+                >
+                    <!-- Book Icon from Lucide -->
+                    <LucideBookIcon class="w-15 h-15 mr-2 text-gray-800" />
+                    <span>Library Management</span>
+                </h2>
+                <div class="relative w-full sm:w-auto">
+                    <!-- Search Icon using Lucide -->
+                    <LucideSearchIcon
+                        class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500"
+                    />
+                    <input
+                        v-model="searchQuery"
+                        type="text"
+                        placeholder="Search books..."
+                        class="px-4 py-2 pl-10 w-full sm:w-64 border rounded-md text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 ml-auto"
+                    />
+                </div>
+            </div>
+        </header>
 
         <div class="flex flex-col md:flex-row bg-[#F1F0E8] min-h-screen">
             <!-- Sidebar -->
+            <!-- Sidebar -->
             <aside
-                class="w-full lg:w-1/4 bg-[#E5E1DA] p-6 flex flex-col border-b lg:border-b-0 lg:border-r border-black"
+                class="w-full lg:w-1/4 bg-[#E5E1DA] p-6 flex flex-col border-b lg:border-b-0 lg:border-r border-black h-screen"
             >
-                <div class="flex flex-col items-center mb-6">
+                <!-- User Info Section -->
+                <div class="flex flex-col items-center mb-16 pb-16">
                     <img
                         :src="user.avatar"
                         :alt="user.name"
@@ -170,9 +181,69 @@ onMounted(() => {
                         <p class="text-sm lg:text-base text-gray-600">
                             {{ $page.props.auth.user.email }}
                         </p>
+                        <p class="text-sm lg:text-base text-gray-500">age</p>
+                        <p class="text-sm lg:text-base text-gray-500">gender</p>
+                        <p class="text-sm lg:text-base text-gray-500">
+                            address
+                        </p>
+
                         <p class="font-bold text-sm lg:text-base text-gray-500">
                             {{ getRole($page.props.auth.user.role_id) }}
                         </p>
+                    </div>
+                </div>
+
+                <!-- Push this section to the bottom -->
+                <div class="mt-auto">
+                    <!-- Gender Input Field -->
+                    <div class="mt-4">
+                        <label
+                            for="gender"
+                            class="block text-sm font-medium text-gray-800"
+                        >
+                            Gender
+                        </label>
+                        <select
+                            id="gender"
+                            class="mt-1 block w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                        >
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <!-- Phone Number Input Field -->
+                    <div class="mt-4">
+                        <label
+                            for="phonenumber"
+                            class="block text-sm font-medium text-gray-800"
+                        >
+                            Phone Number
+                        </label>
+                        <input
+                            id="phonenumber"
+                            type="text"
+                            placeholder="Enter phone number"
+                            class="mt-1 block w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                        />
+                    </div>
+
+                    <!-- Address Input Field -->
+                    <div class="mt-4">
+                        <label
+                            for="address"
+                            class="block text-sm font-medium text-gray-800"
+                        >
+                            Address
+                        </label>
+                        <textarea
+                            id="address"
+                            rows="2"
+                            placeholder="Enter address"
+                            class="mt-1 block w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none resize-none"
+                        ></textarea>
                     </div>
                 </div>
             </aside>
@@ -234,94 +305,100 @@ onMounted(() => {
                 </section>
 
                 <!-- Search Results Display -->
-                <div
-                    class="bg-gray-100 p-4 md:p-6 rounded-lg shadow-md border border-black mb-6 max-h-64 overflow-y-auto"
-                >
-                    <h3 class="text-xl font-semibold text-gray-800">
-                        Search Results
-                    </h3>
-                    <ul class="mt-4 space-y-2">
-                        <li
-                            v-for="book in books.filter(
-                                (book) => book.num_copies > 1
-                            )"
-                            :key="book.id"
-                            class="p-4 bg-white rounded-md shadow-md flex justify-between items-center"
-                        >
-                            <div>
-                                <p class="font-semibold">{{ book.title }}</p>
-                                <p class="text-gray-500">
-                                    {{ book.author_name }}
-                                </p>
-                                <p class="text-gray-400">
-                                    <strong>Category & Genre:</strong>
-                                    {{ book.category }}, {{ book.genre }}
-                                </p>
-                                <p class="text-gray-400">
-                                    <strong>Year Published:</strong>
-                                    {{ book.year_published }}
-                                </p>
-                            </div>
-                            <button
-                                @click="borrowBook(book)"
-                                class="px-4 py-2 bg-black text-white rounded hover:bg-neutral-700 transition"
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Search Box Column -->
+                    <div
+                        class="bg-gray-100 p-4 md:p-6 rounded-lg shadow-lg border border-black mb-6 max-h-[300px] overflow-y-auto origin-top-left"
+                    >
+                        <h3 class="text-xl font-semibold text-gray-800">
+                            Search Results
+                        </h3>
+                        <ul class="mt-4 space-y-2">
+                            <li
+                                v-for="book in books.filter(
+                                    (book) => book.num_copies > 1
+                                )"
+                                :key="book.id"
+                                class="p-4 bg-white rounded-md shadow-md flex justify-between items-center"
                             >
-                                Borrow
-                            </button>
-                        </li>
-                    </ul>
-                    <p v-if="books.length === 0" class="text-gray-500">
-                        No books found.
-                    </p>
-                </div>
+                                <div>
+                                    <p class="font-semibold">
+                                        {{ book.title }}
+                                    </p>
+                                    <p class="text-gray-500">
+                                        {{ book.author_name }}
+                                    </p>
+                                    <p class="text-gray-400">
+                                        <strong>Category & Genre:</strong>
+                                        {{ book.category }}, {{ book.genre }}
+                                    </p>
+                                    <p class="text-gray-400">
+                                        <strong>Year Published:</strong>
+                                        {{ book.year_published }}
+                                    </p>
+                                </div>
+                                <button
+                                    @click="borrowBook(book)"
+                                    class="px-4 py-2 bg-black text-white rounded hover:bg-neutral-700 transition"
+                                >
+                                    Borrow
+                                </button>
+                            </li>
+                        </ul>
+                        <p v-if="books.length === 0" class="text-gray-500">
+                            No books found.
+                        </p>
+                    </div>
 
-                <!-- Borrow Logs -->
-                <div
-                    class="bg-gray-100 p-4 md:p-6 rounded-lg shadow-md border border-black h-64 overflow-y-auto max-h-64"
-                >
-                    <h3 class="text-xl font-semibold text-gray-800">
-                        Borrow Logs
-                    </h3>
-                    <ul class="mt-4 space-y-2">
-                        <li
-                            v-for="(log, index) in borrowLogs"
-                            :key="index"
-                            :class="{
-                                'border-green-500':
-                                    log.current_status === 'accepted',
-                                'border-blue-500':
-                                    log.current_status === 'returned',
-                                'border-gray-300':
-                                    log.current_status !== 'accepted' &&
-                                    log.current_status !== 'returned',
-                            }"
-                            class="p-2 bg-white rounded-md shadow-md border-2"
-                        >
-                            <div>
-                                <p class="font-semibold">
-                                    {{ log.book_title }}
-                                </p>
-                                <p class="text-gray-500">
-                                    {{ log.book_author }}
-                                </p>
-                                <p class="text-gray-400">
-                                    <strong>Copy ID:</strong> {{ log.copy_id }}
-                                </p>
-                                <p class="text-gray-400">
-                                    <strong>Borrowed On:</strong>
-                                    {{ log.date_borrowed }}
-                                </p>
-                                <p class="text-gray-400">
-                                    <strong>Return Date:</strong>
-                                    {{ log.return_date || "N/A" }}
-                                </p>
-                                <p class="text-gray-400">
-                                    <strong>Current Status:</strong>
-                                    {{ log.current_status }}
-                                </p>
-                            </div>
-                        </li>
-                    </ul>
+                    <!-- Borrow Logs Column -->
+                    <div
+                        class="bg-gray-100 p-4 md:p-6 rounded-lg shadow-lg border border-black overflow-y-auto max-h-[300px] origin-top-right"
+                    >
+                        <h3 class="text-xl font-semibold text-gray-800">
+                            Borrow Logs
+                        </h3>
+                        <ul class="mt-4 space-y-2">
+                            <li
+                                v-for="(log, index) in borrowLogs"
+                                :key="index"
+                                :class="{
+                                    'border-green-500':
+                                        log.current_status === 'accepted',
+                                    'border-blue-500':
+                                        log.current_status === 'returned',
+                                    'border-gray-300':
+                                        log.current_status !== 'accepted' &&
+                                        log.current_status !== 'returned',
+                                }"
+                                class="p-2 bg-white rounded-md shadow-md border-2"
+                            >
+                                <div>
+                                    <p class="font-semibold">
+                                        {{ log.book_title }}
+                                    </p>
+                                    <p class="text-gray-500">
+                                        {{ log.book_author }}
+                                    </p>
+                                    <p class="text-gray-400">
+                                        <strong>Copy ID:</strong>
+                                        {{ log.copy_id }}
+                                    </p>
+                                    <p class="text-gray-400">
+                                        <strong>Borrowed On:</strong>
+                                        {{ log.date_borrowed }}
+                                    </p>
+                                    <p class="text-gray-400">
+                                        <strong>Return Date:</strong>
+                                        {{ log.return_date || "N/A" }}
+                                    </p>
+                                    <p class="text-gray-400">
+                                        <strong>Current Status:</strong>
+                                        {{ log.current_status }}
+                                    </p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </main>
         </div>
