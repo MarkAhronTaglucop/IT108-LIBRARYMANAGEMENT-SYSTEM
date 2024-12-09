@@ -78,19 +78,7 @@ const recentActivities = ref([
                         </h2>
                     </div>
 
-                    <!-- Search Input -->
-                    <div class="flex items-center space-x-4">
-                        <div class="relative">
-                            <input
-                                type="text"
-                                class="w-64 px-4 py-2 rounded-lg text-black border border-gray-300"
-                                placeholder="Search books..."
-                            />
-                            <Search
-                                class="absolute right-3 top-2.5 text-gray-500"
-                            />
-                        </div>
-                    </div>
+                    
                 </header>
 
                 <!--Pwede ko pa bind sa logs para ma display pls fetch lungs-->

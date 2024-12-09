@@ -80,6 +80,7 @@ function handleImageError() {
                 :href="route('login')"
                 class="rounded-md px-4 py-2 bg-[#FFFFFF] text-[#000000] font-medium ring-1 ring-transparent transition-all duration-300 hover:bg-[#C0C0C0] hover:text-[#2F4F4F] focus:outline-none focus-visible:ring-[#89A8B2] dark:bg-[#B3C8CF] dark:text-[#F1F0E8] dark:hover:bg-[#E5E1DA] dark:hover:text-[#89A8B2] dark:focus-visible:ring-[#F1F0E8]"
               >
+
                 Log in
               </Link>
 
@@ -114,13 +115,11 @@ function handleImageError() {
                 <div
                   class="flex flex-col gap-4 sm:flex-row sm:justify-center lg:justify-start"
                 >
-                  <Link
-                    v-if="canRegister"
-                    :href="route('register')"
+                  <button
                     class="rounded-full bg-[#F1F0E8] px-6 py-3 font-semibold text-[#89A8B2] shadow-lg transition hover:bg-[#E5E1DA]"
                   >
                     Get Started
-                  </Link>
+                  </button>
                   <button
                     class="rounded-full border-2 border-[#F1F0E8] px-6 py-3 font-semibold text-[#F1F0E8] transition hover:bg-[#F1F0E8] hover:text-[#89A8B2]"
                   >
