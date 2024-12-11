@@ -30,7 +30,7 @@ Route::middleware(['auth', 'setDB'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'librarySummary'])->name('dashboard');
 
     Route::get('/user-dashboard', [UserController::class, 'display_info'])->name('user-dashboard');
-    Route::get('/user-dashboard/search', [UserController::class, 'search'])->name('user.search');
+    // Route::get('/user-dashboard/search', [UserController::class, 'search'])->name('user.search');
     Route::post('/user-dashboard/borrow-book', [UserController::class, 'borrowBook'])->name('user.borrowBook');
     Route::get('/user-dashboard/logs', [UserController::class, 'borrowLogs'])->name('user-dashboard.logs');
 
@@ -40,7 +40,7 @@ Route::middleware(['auth', 'setDB'])->group(function () {
         Route::get('/librarian-dashboard/search', [LibrarianController::class, 'search'])->name('librarian.search');
         Route::post('/librarian-dashboard/add', [LibrarianController::class, 'addBook'])->name('librarian.add');
         Route::patch('/librarian-dashboard/update/{borrowedBook}', [LibrarianController::class, 'updateStatus'])->name('librarian-dashboard.update');
-        Route::put('/librarian-dashboard/update/{id}', [LibrarianController::class, 'updateBook'])->name('librarian.update');
+            Route::put('/librarian-dashboard/update/{id}', [LibrarianController::class, 'updateBook'])->name('librarian.update');
         Route::post('/librarian-dashboard/destroy/{id}', [LibrarianController::class, 'deleteBook'])->name('librarian.destroy');
 
     });
@@ -50,6 +50,7 @@ Route::middleware(['auth', 'setDB'])->group(function () {
         Route::get('/admin-dashboard', [AdminController::class, 'users'])->name('admin-dashboard');
         Route::put('/admin-users/{user}', [AdminController::class, 'updateUserRole'])->name('admin.updateUserRole');
         Route::delete('/admin-users/{user}', [AdminController::class, 'deleteUser'])->name('admin.deleteUser');
+        route::post('/admin-users', [AdminController::class, 'refresh'])->name('admin.refresh');
     });
 });
 

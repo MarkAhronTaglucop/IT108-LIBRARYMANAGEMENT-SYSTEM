@@ -15,10 +15,12 @@ class AdminController extends Controller
         $users = User::with('role')->get();
         $roles = DB::table('roles')->get();
         $summary = DB::table('library_summary')->first();
+        $logs = DB::table('user_activity_logs')->get();
         return Inertia::render('AdminInterface', [
             'users' => $users, 
             'roles' => $roles,
             'summary' => $summary,
+            'logs' => $logs,
         ]);
     }
 
@@ -79,5 +81,14 @@ class AdminController extends Controller
         DB::table('users')->where('id', $userId)->delete();
 
         return redirect()->back()->with('message', 'User deleted successfully');
+    }
+
+
+    public function refresh()
+    {
+        // Refresh the materialized view
+        DB::statement('REFRESH MATERIALIZED VIEW user_activity_logs');
+
+        return redirect()->back()->with('message', 'refreshed successfully');
     }
 }

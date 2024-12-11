@@ -23,14 +23,14 @@ const props = defineProps({
     borrowLogs: Array,
     filteredBooks: Array,
     summary: {
-        type: Object,
-        required: true,
-    },
+    type: Object,
+    required: true,
+  },
 });
 
 // Reactive states
 const searchQuery = ref("");
-const filteredBooks = ref(props.filteredBooks || []);
+const filteredBooks = ref([...props.books]); 
 const users = ref(props.users || []);
 const cachedRoles = ref(props.roles || []);
 const books = ref(props.books || []);
@@ -53,82 +53,68 @@ const user = ref({
 });
 
 // Borrow Book function
-const borrowBook = async (book) => {
-    try {
-        // Check if the user has already borrowed the book
-        const borrowedBook = borrowLogs.value.find(
-            (log) => log.current_status === "pending"
-        );
+const borrowBook = (book) => {
+    // Check if the user has already borrowed the book
+    const borrowedBook = borrowLogs.value.find(
+        (log) => log.current_status === "pending" && log.book_id === book.id
+    );
 
-        if (borrowedBook) {
-            // If the user has already borrowed the book, show an alert and return
-            alert(`You have already borrowed: ${book.title}`);
-            return;
-        }
+    if (borrowedBook) {
+        // If the user has already borrowed the book, show an alert and return
+        alert(`You have already borrowed: ${book.title}`);
+        return;
+    }
 
-        // Ask for user confirmation before borrowing the book
-        const confirmBorrow = confirm(
-            `Do you want to borrow this book: ${book.title}?`
-        );
-        if (!confirmBorrow) {
-            return; // Exit if the user cancels
-        }
+    // Ask for user confirmation before borrowing the book
+    const confirmBorrow = confirm(
+        `Do you want to borrow this book: ${book.title}?`
+    );
+    if (!confirmBorrow) {
+        return; // Exit if the user cancels
+    }
 
-        // Proceed with borrowing the book
-        await router.post("/user-dashboard/borrow-book", {
+    // Proceed with borrowing the book
+    router.post(
+        route("user.borrowBook"),
+        {
             users_id: props.auth.user.id,
             book_id: book.id,
-        });
-
-        // Update borrowLogs and show success message
-        alert(`You successfully borrowed: ${book.title}`);
-    } catch (error) {
-        console.error(error);
-    }
+        },
+        {
+            onSuccess: () => {
+                alert(`You have successfully borrowed: ${book.title}`);
+            },
+            onError: () => {
+                alert("There was an error borrowing the book. Please try again.");
+            },
+        }
+    );
 };
 
+
+
 // Debounced search function
-const debouncedSearch = debounce(async (newQuery) => {
+const debouncedSearch = debounce((newQuery) => {
     if (newQuery.trim()) {
-        await router.get(
-            route("user.search"),
-            { searchQuery: newQuery },
-            { preserveState: true, preserveScroll: true }
+        filteredBooks.value = props.books.filter((book) =>
+            book.title.toLowerCase().includes(newQuery.toLowerCase()) ||
+            book.author_name.toLowerCase().includes(newQuery.toLowerCase()) ||
+            book.category.toLowerCase().includes(newQuery.toLowerCase()) ||
+            book.genre.toLowerCase().includes(newQuery.toLowerCase())
         );
+    } else {
+        filteredBooks.value = [...props.books]; // Reset to default
     }
 }, 300);
 
+
 // Watch for changes in searchQuery
-watch(searchQuery, (newQuery, oldQuery) => {
-    if (!newQuery.trim()) {
-        filteredBooks.value = Array.isArray(props.books)
-            ? [...props.books]
-            : [];
-        router.get(route("user-dashboard"), {}, { preserveState: true });
-    } else if (oldQuery.length === 1 && newQuery.length === 0) {
-        debouncedSearch.cancel();
-        filteredBooks.value = Array.isArray(props.books)
-            ? [...props.books]
-            : [];
-        router.get(route("luser-dashboard"), {}, { preserveState: true });
-    } else {
-        debouncedSearch(newQuery);
-    }
+watch(searchQuery, (newQuery) => {
+    debouncedSearch(newQuery); // Always run the debounced function
 });
 
-// Watch for backend updates to searchedbooks
-watch(
-    () => props.searchedbooks,
-    (newBooks) => {
-        filteredBooks.value =
-            Array.isArray(newBooks) && newBooks.length > 0
-                ? newBooks
-                : Array.isArray(props.books)
-                ? [...props.books]
-                : [];
-    },
-    { immediate: true }
-);
+
+
 // On Mounted Hooks
 onMounted(() => {
     console.log("Borrow Logs:", props.borrowLogs); // Inspect the data

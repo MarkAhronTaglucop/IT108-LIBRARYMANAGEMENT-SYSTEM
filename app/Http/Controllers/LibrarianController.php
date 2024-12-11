@@ -76,6 +76,8 @@ class LibrarianController extends Controller
                 $request->input('author_name'),
                 $request->input('author_country'),
             ]);
+            // Refresh the materialized view
+            DB::statement('REFRESH MATERIALIZED VIEW view_books');
             return redirect()->route('librarian-dashboard')->with('success', 'Book updated successfully.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to add the book: ' . $e->getMessage());
@@ -87,31 +89,34 @@ class LibrarianController extends Controller
 
 
     //To update A book its information and copies and such
-    public function updateBook(Request $request, $id)
-    {
-        try {
-            $request->validate([
-                'title' => 'required|string|max:255',
-                'category' => 'required|string|max:50',
-                'genre' => 'required|string|max:50',
-                'year_published' => 'required|date',
-                'number_of_copies' => 'required|integer|min:1',
-            ]);
+        public function updateBook(Request $request, $id)
+        {
+            try {
+                $request->validate([
+                    'title' => 'required|string|max:255',
+                    'category' => 'required|string|max:50',
+                    'genre' => 'required|string|max:50',
+                    'year_published' => 'required|date',
+                    'number_of_copies' => 'required|integer|min:1',
+                ]);
 
-            DB::statement('SELECT update_book_and_copies(?, ?, ?, ?, ?, ?)', [
-                $id,
-                $request->input('title'),
-                $request->input('category'),
-                $request->input('genre'),
-                $request->input('year_published'),
-                $request->input('number_of_copies'),
-            ]);
+                DB::statement('SELECT update_book_and_copies(?, ?, ?, ?, ?, ?)', [
+                    $id,
+                    $request->input('title'),
+                    $request->input('category'),
+                    $request->input('genre'),
+                    $request->input('year_published'),
+                    $request->input('number_of_copies'),
+                ]);
 
-            return redirect()->route('librarian-dashboard')->with('success', 'Book updated successfully.');
-        } catch (\Exception $e) {
-            return back()->route('librarian-dashboard')->with('error', 'Failed to update the book: ' . $e->getMessage());
+                // Refresh the materialized view
+                DB::statement('REFRESH MATERIALIZED VIEW view_books');
+
+                return redirect()->route('librarian-dashboard')->with('success', 'Book updated successfully.');
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', 'Failed to update the book: ' . $e->getMessage());
+            }
         }
-    }
 
 
     //To Delete a book

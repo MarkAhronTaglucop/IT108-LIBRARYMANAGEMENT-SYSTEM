@@ -151,7 +151,7 @@ const updateStatus = async (borrowedId, newStatusId) => {
         onError: (errors) => console.error("Validation errors:", errors),
       }
     );
-    // window.location.reload();
+    window.location.reload();
   } catch (error) {
     console.error("Error updating status:", error);
   }
@@ -291,50 +291,6 @@ const validateCopies = (event) => {
           <LayoutDashboardIcon class="w-6 md:w-8 h-6 md:h-8 mr-2" />
           Dashboard
         </h1>
-
-        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div
-            class="bg-white rounded-lg shadow-md p-6 flex items-center space-x-4"
-          >
-            <div class="bg-blue-100 p-3 rounded-full">
-              <BookOpen class="w-8 h-8 text-blue-500" />
-            </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-700">Total Books</h3>
-              <p class="text-2xl font-bold text-gray-900">
-                {{ summary.total_books }}
-              </p>
-            </div>
-          </div>
-          <div
-            class="bg-white rounded-lg shadow-md p-6 flex items-center space-x-4"
-          >
-            <div class="bg-green-100 p-3 rounded-full">
-              <BookMarked class="w-8 h-8 text-green-500" />
-            </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-700">
-                Books Borrowed
-              </h3>
-              <p class="text-2xl font-bold text-gray-900">
-                {{ summary.total_borrowed_books }}
-              </p>
-            </div>
-          </div>
-          <div
-            class="bg-white rounded-lg shadow-md p-6 flex items-center space-x-4"
-          >
-            <div class="bg-purple-100 p-3 rounded-full">
-              <Users class="w-8 h-8 text-purple-500" />
-            </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-700">Active Users</h3>
-              <p class="text-2xl font-bold text-gray-900">
-                {{ summary.total_users_role_1 }}
-              </p>
-            </div>
-          </div>
-        </section>
 
         <!-- Add Book Button -->
         <div class="mb-4 flex justify-end">

@@ -16,6 +16,7 @@ import {
   PlusIcon,
   EyeIcon,
   Book as LucideBookIcon,
+  RefreshCcw,
 } from "lucide-vue-next";
 
 // Props
@@ -26,6 +27,7 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  logs: Array,
 });
 
 // Reactive state for users
@@ -123,6 +125,18 @@ const submitUser = () => {
   }
 };
 
+// Function to refresh the materialized view
+const refreshView = async () => {
+  try {
+    // Send POST request via Inertia
+    router.post(route("admin.refresh"));
+  } catch (err) {
+    // Handle error response
+    error.value = "Failed to refresh the materialized view.";
+    console.error(err);
+  }
+};
+
 // Close the modal and reset the form
 const closeModal = () => {
   showAddUserModal.value = false;
@@ -143,7 +157,7 @@ const closeModal = () => {
         >
           <!-- Book Icon from Lucide -->
           <LucideBookIcon class="w-15 h-15 mr-2 text-gray-800" />
-          <span >Library Management</span>
+          <span>Library Management</span>
         </h2>
       </div>
     </header>
@@ -174,7 +188,9 @@ const closeModal = () => {
       </aside>
 
       <!-- Main Content -->
-      <main class="w-full lg:w-3/4 p-4 lg:p-8 bg-[#F1F0E8] min-h-100">
+      <main
+        class="w-full lg:w-3/4 p-4 lg:p-8 bg-[#F1F0E8] min-h-100 overflow-y-auto"
+      >
         <h1
           class="text-xl lg:text-3xl font-bold mb-4 lg:mb-6 text-gray-800 flex items-center"
         >
@@ -210,6 +226,7 @@ const closeModal = () => {
         <div
           class="bg-white shadow-md rounded-lg min-h-80 max-h-80 overflow-y-auto"
         >
+          <h2 class="text-lg font-semibold mb-4 pt-2 px-7">User Management</h2>
           <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
@@ -276,6 +293,84 @@ const closeModal = () => {
                     >
                       Delete
                     </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Refresh Button For Activity Logs -->
+        <div class="flex justify-end pt-4">
+          <button
+            @click="refreshView"
+            class="px-4 py-2 bg-black text-white rounded hover:bg-green-700 transition flex items-center"
+          >
+            <RefreshCcw class="w-5 h-5 mr-2" />
+            Refresh
+          </button>
+        </div>
+        <!-- Activity  Logs -->
+        <div
+          class="bg-white shadow-md rounded-lg min-h-80 max-h-80 overflow-y-auto mt-4"
+        >
+          <h2 class="text-lg font-semibold mb-4 py-2 px-7">Activity Logs</h2>
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th
+                    class="px-4 lg:px-6 py-2 lg:py-3 text-left text-xs lg:text-sm font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Id
+                  </th>
+                  <th
+                    class="px-4 lg:px-6 py-2 lg:py-3 text-left text-xs lg:text-sm font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Username
+                  </th>
+                  <th
+                    class="px-4 lg:px-6 py-2 lg:py-3 text-left text-xs lg:text-sm font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Table Name
+                  </th>
+                  <th
+                    class="px-4 lg:px-6 py-2 lg:py-3 text-left text-xs lg:text-sm font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Action
+                  </th>
+                  <th
+                    class="px-4 lg:px-6 py-2 lg:py-3 text-left text-xs lg:text-sm font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Time
+                  </th>
+                  <th
+                    class="px-4 lg:px-6 py-2 lg:py-3 text-left text-xs lg:text-sm font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Role
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200 text-black">
+                <tr v-for="log in logs" :key="log.users_id">
+                  <td class="px-4 lg:px-6 py-3 whitespace-nowrap">
+                    {{ log.users_id }}
+                  </td>
+                  <td class="px-4 lg:px-6 py-3 whitespace-nowrap">
+                    {{ log.username }}
+                  </td>
+                  <td class="px-4 lg:px-6 py-3 whitespace-nowrap">
+                    {{ log.table_name }}
+                  </td>
+                  <td class="px-4 lg:px-6 py-3 whitespace-nowrap">
+                    {{ log.action }}
+                  </td>
+                  <td class="px-4 lg:px-6 py-3 whitespace-nowrap">
+                    {{ log.time }}
+                  </td>
+                  <td class="px-4 lg:px-6 py-3 whitespace-nowrap">
+                    {{ log.role }}
                   </td>
                 </tr>
               </tbody>
