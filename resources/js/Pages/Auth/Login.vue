@@ -1,12 +1,12 @@
 <script setup>
-import Checkbox from '@/Components/Checkbox.vue';
-import GuestLayout from '@/Layouts/GuestLayout.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
-import { Mail, Lock, User } from 'lucide-vue-next';
+import Checkbox from "@/Components/Checkbox.vue";
+import GuestLayout from "@/Layouts/GuestLayout.vue";
+import InputError from "@/Components/InputError.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import TextInput from "@/Components/TextInput.vue";
+import { Head, Link, useForm } from "@inertiajs/vue3";
+import { Mail, Lock, User } from "lucide-vue-next";
 
 defineProps({
     canResetPassword: {
@@ -18,14 +18,14 @@ defineProps({
 });
 
 const form = useForm({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
     remember: false,
 });
 
 const submit = () => {
-    form.post(route('login'), {
-        onFinish: () => form.reset('password'),
+    form.post(route("login"), {
+        onFinish: () => form.reset("password"),
     });
 };
 </script>
@@ -33,13 +33,12 @@ const submit = () => {
 <template>
     <GuestLayout>
         <Head title="Log in" />
-        
+
         <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
             {{ status }}
         </div>
 
         <form @submit.prevent="submit">
-            
             <h1 class="text-3xl text-center py-4 text-bold">Welcome Back!</h1>
             <div>
                 <InputLabel for="email" value="Email" />
@@ -48,7 +47,7 @@ const submit = () => {
                     <TextInput
                         id="email"
                         type="email"
-                        class="mt-1 block w-full pl-10"  
+                        class="mt-1 block w-full pl-10"
                         v-model="form.email"
                         maxlength="100"
                         required
@@ -56,7 +55,8 @@ const submit = () => {
                         autocomplete="username"
                     />
                     <span class="absolute left-3 top-3 text-gray-500">
-                        <Mail size="18" /> <!-- Lucide Email Icon -->
+                        <Mail size="18" />
+                        <!-- Lucide Email Icon -->
                     </span>
                 </div>
 
@@ -70,14 +70,15 @@ const submit = () => {
                     <TextInput
                         id="password"
                         type="password"
-                        class="mt-1 block w-full pl-10" 
+                        class="mt-1 block w-full pl-10"
                         v-model="form.password"
                         maxlength="50"
                         required
                         autocomplete="current-password"
                     />
                     <span class="absolute left-3 top-3 text-gray-500">
-                        <Lock size="18" /> <!-- Lucide Lock Icon -->
+                        <Lock size="18" />
+                        <!-- Lucide Lock Icon -->
                     </span>
                 </div>
 

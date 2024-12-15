@@ -74,7 +74,7 @@ return [
             'port' => env('DB_PORT', '5432'),
             'database' => env('DB_DATABASE', 'forge'),
             'username' => 'admin',
-            'password' => 'admin_password',
+            'password' => 'admin_password1',
             'charset' => 'utf8',
             'prefix' => '',
             'schema' => 'public',

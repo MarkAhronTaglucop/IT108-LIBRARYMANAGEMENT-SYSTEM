@@ -190,9 +190,9 @@ onMounted(() => {
                     <LayoutDashboardIcon class="w-6 md:w-8 h-6 md:h-8 mr-2" />
                     Dashboard
                 </h1>
-                <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 ">
                     <div
-                        class="bg-white rounded-lg shadow-md p-6 flex items-center space-x-4"
+                        class="bg-white rounded-lg shadow-md p-6 flex items-center space-x-4 transition duration-300 ease-in-out transform hover:scale-105"
                     >
                         <div class="bg-blue-100 p-3 rounded-full">
                             <BookOpen class="w-8 h-8 text-blue-500" />
@@ -207,7 +207,7 @@ onMounted(() => {
                         </div>
                     </div>
                     <div
-                        class="bg-white rounded-lg shadow-md p-6 flex items-center space-x-4"
+                        class="bg-white rounded-lg shadow-md p-6 flex items-center space-x-4 transition duration-300 ease-in-out transform hover:scale-105"
                     >
                         <div class="bg-green-100 p-3 rounded-full">
                             <BookMarked class="w-8 h-8 text-green-500" />
@@ -222,7 +222,7 @@ onMounted(() => {
                         </div>
                     </div>
                     <div
-                        class="bg-white rounded-lg shadow-md p-6 flex items-center space-x-4"
+                        class="bg-white rounded-lg shadow-md p-6 flex items-center space-x-4 transition duration-300 ease-in-out transform hover:scale-105"
                     >
                         <div class="bg-purple-100 p-3 rounded-full">
                             <Users class="w-8 h-8 text-purple-500" />

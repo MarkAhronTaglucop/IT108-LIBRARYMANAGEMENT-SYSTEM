@@ -5,7 +5,7 @@ import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
-import { Mail, User, Lock } from "lucide-vue-next";
+import { Mail, User, Lock , EyeClosed } from "lucide-vue-next";
 import DOMPurify from 'dompurify';
 
 
@@ -83,8 +83,8 @@ const submit = () => {
         <Head title="Register" />
 
         <form @submit.prevent="submit">
-            <h1 class="text-center text-3xl font-bold">
-                Welcome To The Library
+            <h1 class="text-center text-3xl font-bold py-4">
+                Welcome To Bookkeeper
             </h1>
             <h4 class="text-1xl pt-6 pb-2">Please fill up the following:</h4>
 

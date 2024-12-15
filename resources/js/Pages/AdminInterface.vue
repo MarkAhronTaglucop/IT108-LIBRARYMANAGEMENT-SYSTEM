@@ -201,7 +201,7 @@ const closeModal = () => {
         <!-- Total Users and Librarians -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <!-- Total Users -->
-          <div class="bg-white shadow rounded-lg p-4 flex items-center">
+          <div class="bg-white shadow rounded-lg p-4 flex items-center transition duration-300 ease-in-out transform hover:scale-105">
             <UserIcon
               class="w-10 h-10 text-purple-500 mr-3 bg-purple-100 rounded-full p-2"
             />
@@ -211,7 +211,7 @@ const closeModal = () => {
             </div>
           </div>
           <!-- Total Librarians -->
-          <div class="bg-white shadow rounded-lg p-4 flex items-center">
+          <div class="bg-white shadow rounded-lg p-4 flex items-center transition duration-300 ease-in-out transform hover:scale-105">
             <MessageSquareIcon
               class="w-10 h-10 text-green-500 mr-3 bg-green-100 rounded-full p-2"
             />
